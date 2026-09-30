@@ -112,8 +112,16 @@ export const PRESET_MEDIA = [
     url: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&auto=format&fit=crop&q=85',
     thumbnail: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&auto=format&fit=crop&q=80'
   },
+  {
+    id: 'img-abstract-2',
+    name: 'Neon Cyber Geometry',
+    type: 'image',
+    category: 'Abstract',
+    url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1920&auto=format&fit=crop&q=85',
+    thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&auto=format&fit=crop&q=80'
+  },
 
-  // Videos - Nature & Animation
+  // Videos - Nature, Animation, Backgrounds, Visual Effects
   {
     id: 'vid-nature-1',
     name: 'Ocean Coast Waves Aerial',
@@ -140,6 +148,15 @@ export const PRESET_MEDIA = [
     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=400&auto=format&fit=crop&q=80',
     duration: 120
+  },
+  {
+    id: 'vid-vfx-1',
+    name: 'Elephants Dream Cinematic VFX',
+    type: 'video',
+    category: 'Visual Effects',
+    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80',
+    duration: 653
   }
 ];
 

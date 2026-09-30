@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Smartphone, Layers, Play, Sparkles, QrCode, ArrowRight, ShieldCheck, Zap, Users } from 'lucide-react';
 
-export default function Home({ onNavigate, onQuickStartCake }) {
+export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }) {
   const [manualCode, setManualCode] = useState('');
 
   const handleJoinSubmit = (e) => {
@@ -80,7 +80,20 @@ export default function Home({ onNavigate, onQuickStartCake }) {
               color: '#f472b6'
             }}
           >
-            🎂 Quick Demo: Virtual Cake Party
+            🎂 Demo: Virtual Cake Party
+          </button>
+
+          <button
+            onClick={onQuickStartCyber}
+            className="btn-secondary"
+            style={{
+              padding: '16px 28px',
+              fontSize: '1.1rem',
+              borderColor: 'rgba(0, 255, 255, 0.35)',
+              color: '#00e5ff'
+            }}
+          >
+            ⚡ Demo: Cyber Wave Matrix
           </button>
         </div>
 
@@ -193,6 +206,30 @@ export default function Home({ onNavigate, onQuickStartCake }) {
           </h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
             Combine phones for celebrations. Swipe a virtual knife across screens to slice the cake with confetti & candles!
+          </p>
+        </div>
+
+        {/* Card 4 — Cyber Wave */}
+        <div className="glass-panel" style={{ padding: '28px' }}>
+          <div style={{
+            background: 'rgba(0, 255, 255, 0.1)',
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#00e5ff',
+            marginBottom: '18px',
+            fontSize: '22px'
+          }}>
+            ⚡
+          </div>
+          <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '8px' }}>
+            Cyber Wave Matrix
+          </h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+            Mesmerizing neon pulse waves scroll across every screen. Tap any phone to send a synchronized ripple burst. Change colors, speed, and trigger glitch mode live!
           </p>
         </div>
       </div>

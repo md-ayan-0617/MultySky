@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const backendTarget = process.env.BACKEND_TARGET || 'http://localhost:3001';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -9,15 +11,15 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: backendTarget,
         changeOrigin: true
       },
       '/uploads': {
-        target: 'http://localhost:3001',
+        target: backendTarget,
         changeOrigin: true
       },
       '/socket.io': {
-        target: 'http://localhost:3001',
+        target: backendTarget,
         ws: true,
         changeOrigin: true
       }

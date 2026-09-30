@@ -13,6 +13,8 @@ import { updateLayout, endSession, updateDevicePosition, removeDevice, getServer
 
 export default function MasterDashboard({ sessionId, onNavigate }) {
   const [isQrOpen, setIsQrOpen] = useState(false);
+  const [isEndSessionOpen, setIsEndSessionOpen] = useState(false);
+  const [isEnding, setIsEnding] = useState(false);
   const [serverInfo, setServerInfo] = useState(null);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
@@ -81,13 +83,30 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
     }
   };
 
-  const handleEndSession = async () => {
-    if (window.confirm('Are you sure you want to end this multi-screen session for all connected devices?')) {
+  const handleConfirmEndSession = async () => {
+    setIsEnding(true);
+    try {
       if (socket) {
         socket.emit('end-session', { sessionId });
       }
       await endSession(sessionId);
       onNavigate('home');
+    } catch (err) {
+      console.error('Failed to end session:', err);
+      onNavigate('home');
+    } finally {
+      setIsEnding(false);
+      setIsEndSessionOpen(false);
+    }
+  };
+
+  const handleBroadcastFullscreen = () => {
+    if (socket) {
+      socket.emit('broadcast-fullscreen', { sessionId });
+    }
+    // Also toggle fullscreen locally if possible
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
     }
   };
 
@@ -173,7 +192,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
             </button>
 
             <button
-              onClick={handleEndSession}
+              onClick={() => setIsEndSessionOpen(true)}
               className="btn-danger"
               style={{ padding: '8px 14px', fontSize: '0.85rem' }}
             >
@@ -214,6 +233,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           onToggleMute={() => setIsMuted(prev => !prev)}
           volume={volume}
           onVolumeChange={setVolume}
+          onToggleFullscreen={handleBroadcastFullscreen}
         />
 
         {/* Row 3: Layout Configuration & Device Management (2 columns) */}
@@ -254,6 +274,86 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
         connectedCount={devices.length}
         serverInfo={serverInfo}
       />
+
+      {/* FR-15: Session Termination Confirmation Modal */}
+      {isEndSessionOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(5, 7, 15, 0.85)',
+          backdropFilter: 'blur(16px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2500,
+          padding: '20px'
+        }}>
+          <div style={{
+            maxWidth: '380px',
+            width: '100%',
+            background: 'rgba(20, 24, 38, 0.95)',
+            border: '1px solid rgba(244, 63, 94, 0.4)',
+            borderRadius: '24px',
+            padding: '32px 24px',
+            textAlign: 'center',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 35px rgba(244, 63, 94, 0.25)',
+            animation: 'glowPulse 3s infinite'
+          }}>
+            {/* Glowing Red Power Icon (Matching PRD FR-15 mockup) */}
+            <div style={{
+              width: '72px',
+              height: '72px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, #f43f5e 0%, #be123c 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+              color: '#fff',
+              boxShadow: '0 0 30px rgba(244, 63, 94, 0.6), inset 0 2px 4px rgba(255,255,255,0.4)'
+            }}>
+              <Power size={36} />
+            </div>
+
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>
+              End Session
+            </h3>
+
+            <p style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fda4af', marginBottom: '8px' }}>
+              Are you sure?
+            </p>
+
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '28px', lineHeight: 1.5 }}>
+              Ending this session will disconnect all connected display phones and return them to the home screen.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <button
+                onClick={() => setIsEndSessionOpen(false)}
+                className="btn-secondary"
+                disabled={isEnding}
+                style={{ padding: '12px', fontSize: '0.95rem' }}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleConfirmEndSession}
+                className="btn-danger"
+                disabled={isEnding}
+                style={{
+                  padding: '12px',
+                  fontSize: '0.95rem',
+                  fontWeight: 700,
+                  boxShadow: '0 4px 15px rgba(244, 63, 94, 0.4)'
+                }}
+              >
+                {isEnding ? 'Ending...' : 'End Session'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

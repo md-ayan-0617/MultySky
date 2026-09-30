@@ -14,8 +14,21 @@ if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
 
 export function getSocket() {
   if (!socketInstance) {
-    // When using Vite dev server with proxy or direct connection
-    const socketUrl = window.location.origin;
+    // Determine backend URL dynamically based on environment
+    let socketUrl = import.meta.env.VITE_BACKEND_URL;
+    if (!socketUrl) {
+      if (typeof window !== 'undefined') {
+        const host = window.location.hostname;
+        const isLocal = host === 'localhost' || host === '127.0.0.1' || /^192\.168\./.test(host) || /^10\./.test(host);
+        if (isLocal) {
+          socketUrl = `http://${host}:3001`;
+        } else {
+          socketUrl = 'https://multysky.onrender.com';
+        }
+      } else {
+        socketUrl = 'http://localhost:3001';
+      }
+    }
 
     socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling'],

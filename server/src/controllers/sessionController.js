@@ -76,6 +76,10 @@ export const endSession = (req, res) => {
     if (!success) {
       return res.status(404).json({ success: false, message: 'Session not found' });
     }
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`session:${id}`).emit('session-ended', { sessionId: id });
+    }
     return res.json({ success: true, message: 'Session ended' });
   } catch (error) {
     console.error('Error ending session:', error);

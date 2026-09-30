@@ -64,7 +64,7 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
     }
   };
 
-  const categories = ['All', 'Interactive', 'Images', 'Videos', 'User Uploads'];
+  const categories = ['All', 'Interactive', 'Images', 'Videos', 'Nature', 'Cakes', 'Space', 'Cities', 'Abstract', 'User Uploads'];
 
   const filteredMedia = mediaItems.filter(item => {
     if (activeCategory === 'All') return true;
@@ -72,7 +72,7 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
     if (activeCategory === 'Images') return item.type === 'image';
     if (activeCategory === 'Videos') return item.type === 'video';
     if (activeCategory === 'User Uploads') return item.category === 'User Uploads';
-    return true;
+    return item.category?.toLowerCase() === activeCategory.toLowerCase();
   });
 
   return (

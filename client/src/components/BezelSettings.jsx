@@ -112,19 +112,36 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
           />
         </div>
 
-        {/* Crop Offset Shift */}
+        {/* Crop Offset Shift X */}
         <div className="glass-panel-subtle" style={{ padding: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1' }}>Pan Alignment Offset</span>
+            <span style={{ color: '#cbd5e1' }}>Horizontal Offset (X)</span>
             <span style={{ color: '#10b981', fontWeight: 600 }}>{offsetX}px</span>
           </div>
           <input
             type="range"
-            min="-50"
-            max="50"
+            min="-100"
+            max="100"
             step="1"
             value={offsetX}
             onChange={(e) => handleChange('offsetX', parseInt(e.target.value))}
+            style={{ width: '100%', accentColor: '#10b981', cursor: 'pointer' }}
+          />
+        </div>
+
+        {/* Crop Offset Shift Y */}
+        <div className="glass-panel-subtle" style={{ padding: '14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
+            <span style={{ color: '#cbd5e1' }}>Vertical Offset (Y)</span>
+            <span style={{ color: '#10b981', fontWeight: 600 }}>{offsetY}px</span>
+          </div>
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            step="1"
+            value={offsetY}
+            onChange={(e) => handleChange('offsetY', parseInt(e.target.value))}
             style={{ width: '100%', accentColor: '#10b981', cursor: 'pointer' }}
           />
         </div>

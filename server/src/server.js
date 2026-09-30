@@ -26,6 +26,8 @@ const io = new Server(server, {
   pingInterval: 10000
 });
 
+app.set('io', io);
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -64,12 +64,36 @@ export default function App() {
     }
   };
 
+  // Instant Quick Start for Cyber Wave Matrix
+  const handleQuickStartCyber = async () => {
+    try {
+      const res = await createSession({
+        layoutId: '2x2',
+        initialMedia: {
+          id: 'exp-cyber-1',
+          name: 'Cyber Wave Matrix (Interactive)',
+          type: 'interactive',
+          category: 'Interactive',
+          subType: 'cyber',
+          thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80'
+        }
+      });
+      if (res?.success && res.session) {
+        navigate('master', { sessionId: res.session.id });
+      }
+    } catch (err) {
+      console.error(err);
+      navigate('create');
+    }
+  };
+
   return (
     <div className="app-container">
       {currentPage === 'home' && (
         <Home
           onNavigate={navigate}
           onQuickStartCake={handleQuickStartCake}
+          onQuickStartCyber={handleQuickStartCyber}
         />
       )}
 

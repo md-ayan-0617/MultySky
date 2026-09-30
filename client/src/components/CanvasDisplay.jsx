@@ -41,13 +41,15 @@ export default function CanvasDisplay({
     const baseW = sourceW / totalCols;
     const baseH = sourceH / totalRows;
 
-    // Adjust crop origin and dimensions taking bezel and scale into account
-    let cropX = (col / totalCols) * sourceW;
-    let cropY = (row / totalRows) * sourceH;
-    let cropW = baseW;
-    let cropH = baseH;
+    // Apply scale / zoom factor to crop window
+    let cropW = baseW / Math.max(0.5, scaleFactor);
+    let cropH = baseH / Math.max(0.5, scaleFactor);
 
-    // Apply bezel compensation: shrink the inner crop slightly so outer parts bridge across the physical phone border
+    // Center scaled crop inside the cell
+    let cropX = (col / totalCols) * sourceW + (baseW - cropW) / 2;
+    let cropY = (row / totalRows) * sourceH + (baseH - cropH) / 2;
+
+    // Apply bezel compensation: shift inner crop to compensate for physical phone borders
     const bezelShiftX = baseW * gapXPct * (col - (totalCols - 1) / 2);
     const bezelShiftY = baseH * gapYPct * (row - (totalRows - 1) / 2);
 
@@ -92,6 +94,29 @@ export default function CanvasDisplay({
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, [isVideo, row, col, totalRows, totalCols, bezel]);
+
+  // Sync video play/pause and currentTime to master commands
+  useEffect(() => {
+    if (!isVideo) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      // Correct drift if more than 0.5s off
+      if (typeof currentTime === 'number' && Math.abs(video.currentTime - currentTime) > 0.5) {
+        video.currentTime = currentTime;
+      }
+      video.play().catch(err => {
+        // Autoplay policy — will play on next user interaction
+        console.log('[CanvasDisplay] Autoplay blocked, waiting for user gesture:', err.message);
+      });
+    } else {
+      video.pause();
+      if (typeof currentTime === 'number' && Math.abs(video.currentTime - currentTime) > 0.5) {
+        video.currentTime = currentTime;
+      }
+    }
+  }, [isPlaying, currentTime, isVideo]);
 
   // Image load & render
   useEffect(() => {

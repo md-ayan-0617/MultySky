@@ -2,6 +2,7 @@ import React from 'react';
 import { Smartphone, Eye, Maximize2, Radio } from 'lucide-react';
 import CanvasDisplay from './CanvasDisplay';
 import VirtualCake from './VirtualCake';
+import CyberWave from './CyberWave';
 
 export default function MultiScreenSimulator({
   layout,
@@ -18,6 +19,7 @@ export default function MultiScreenSimulator({
   const totalSlots = rows * cols;
 
   const isInteractiveCake = media?.type === 'interactive' && media?.subType === 'cake';
+  const isInteractiveCyber = media?.type === 'interactive' && media?.subType === 'cyber';
 
   return (
     <div className="glass-panel" style={{ padding: '24px', overflow: 'hidden' }}>
@@ -118,6 +120,17 @@ export default function MultiScreenSimulator({
                 }}>
                   {isInteractiveCake ? (
                     <VirtualCake
+                      row={row}
+                      col={col}
+                      totalRows={rows}
+                      totalCols={cols}
+                      interactiveState={interactiveState}
+                      onTriggerAction={onTriggerInteractive}
+                      bezel={bezel}
+                      isSimulator={true}
+                    />
+                  ) : isInteractiveCyber ? (
+                    <CyberWave
                       row={row}
                       col={col}
                       totalRows={rows}

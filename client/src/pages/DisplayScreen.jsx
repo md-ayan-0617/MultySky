@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Maximize2, Minimize2, Info, ArrowLeft, Radio, Smartphone, AlertCircle } from 'lucide-react';
 import CanvasDisplay from '../components/CanvasDisplay';
 import VirtualCake from '../components/VirtualCake';
+import CyberWave from '../components/CyberWave';
 import PositionGuideModal from '../components/PositionGuideModal';
 import { useSession } from '../hooks/useSession';
 import { usePlaybackSync } from '../hooks/usePlaybackSync';
@@ -12,7 +13,7 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
   const [showOverlay, setShowOverlay] = useState(true);
 
   // Hook for session & socket
-  const { session, device, isConnected, clockOffset } = useSession({
+  const { session, device, isConnected, clockOffset, socket } = useSession({
     sessionId,
     deviceId,
     role: 'display',
@@ -40,6 +41,20 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
     return () => document.removeEventListener('fullscreenchange', handleFsChange);
   }, []);
 
+  // Listen for master fullscreen broadcast (FR-11, FR-13)
+  useEffect(() => {
+    if (!socket) return;
+    const handleFsRequest = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {
+          setShowOverlay(true);
+        });
+      }
+    };
+    socket.on('fullscreen-requested', handleFsRequest);
+    return () => socket.off('fullscreen-requested', handleFsRequest);
+  }, [socket]);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
@@ -65,6 +80,7 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
   const bezel = session?.bezel || { gapX: 3, gapY: 3, scale: 100, offsetX: 0, offsetY: 0 };
 
   const isInteractiveCake = media?.type === 'interactive' && media?.subType === 'cake';
+  const isInteractiveCyber = media?.type === 'interactive' && media?.subType === 'cyber';
 
   if (session?.status === 'ended') {
     return (
@@ -124,6 +140,16 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         {isInteractiveCake ? (
           <VirtualCake
+            row={position.row}
+            col={position.col}
+            totalRows={layout.rows}
+            totalCols={layout.cols}
+            interactiveState={interactiveState}
+            onTriggerAction={triggerInteractive}
+            bezel={bezel}
+          />
+        ) : isInteractiveCyber ? (
+          <CyberWave
             row={position.row}
             col={position.col}
             totalRows={layout.rows}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Maximize2, Sparkles, Cake, Flame } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Maximize2, Sparkles, Cake, Flame, Zap } from 'lucide-react';
 
 export default function PlaybackControls({
   isPlaying,
@@ -15,10 +15,13 @@ export default function PlaybackControls({
   isMuted,
   onToggleMute,
   volume = 1,
-  onVolumeChange
+  onVolumeChange,
+  onToggleFullscreen
 }) {
   const isVideo = media?.type === 'video';
   const isInteractive = media?.type === 'interactive';
+  const isCyber = media?.type === 'interactive' && media?.subType === 'cyber';
+  const isCake = media?.type === 'interactive' && media?.subType === 'cake';
 
   const formatTime = (secs) => {
     if (!secs || isNaN(secs)) return '00:00';
@@ -98,7 +101,106 @@ export default function PlaybackControls({
               </button>
             </>
           ) : isInteractive ? (
-            /* Interactive Actions for Virtual Cake Party! */
+            /* Interactive Actions split by sub-type */
+            isCyber ? (
+              /* ── Cyber Wave Matrix Controls ─────────────────────────────── */
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                {/* Color Presets */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginRight: '2px' }}>Color:</span>
+                  {[
+                    { color: '#00ffff', label: 'Cyan' },
+                    { color: '#ff00ff', label: 'Magenta' },
+                    { color: '#00ff80', label: 'Neon Green' },
+                    { color: '#ff8c00', label: 'Orange' },
+                    { color: '#4080ff', label: 'Electric Blue' },
+                    { color: '#ffffff', label: 'White' }
+                  ].map(({ color, label }) => (
+                    <button
+                      key={color}
+                      onClick={() => onTriggerInteractive('CYBER_COLOR', { color })}
+                      title={label}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        background: color,
+                        border: interactiveState?.waveColor === color
+                          ? '3px solid #fff'
+                          : '2px solid rgba(255,255,255,0.2)',
+                        cursor: 'pointer',
+                        boxShadow: interactiveState?.waveColor === color
+                          ? `0 0 10px ${color}` : 'none',
+                        transition: 'all 0.15s',
+                        flexShrink: 0
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Wave Speed */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Speed:</span>
+                  {[{ v: 0.4, l: '0.4×' }, { v: 1.0, l: '1×' }, { v: 2.0, l: '2×' }, { v: 3.5, l: '3.5×' }].map(({ v, l }) => (
+                    <button
+                      key={v}
+                      onClick={() => onTriggerInteractive('CYBER_SPEED', { speed: v })}
+                      className="btn-secondary"
+                      style={{
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        background: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
+                          ? 'rgba(0, 255, 255, 0.2)'
+                          : undefined,
+                        borderColor: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
+                          ? 'rgba(0,255,255,0.5)'
+                          : undefined,
+                        color: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
+                          ? '#00ffff'
+                          : undefined
+                      }}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Ripple Burst & Glitch */}
+                <button
+                  onClick={() => onTriggerInteractive('CYBER_RIPPLE', { globalX: 0, globalY: 0, t: Date.now() })}
+                  className="btn-primary"
+                  style={{
+                    background: 'linear-gradient(135deg, #00bfff, #6610f2)',
+                    boxShadow: '0 4px 15px rgba(0,191,255,0.4)',
+                    padding: '8px 16px'
+                  }}
+                >
+                  <Zap size={16} /> Ripple Burst ⚡
+                </button>
+
+                <button
+                  onClick={() => onTriggerInteractive('CYBER_GLITCH', { active: !interactiveState?.glitchActive })}
+                  className="btn-secondary"
+                  style={{
+                    borderColor: interactiveState?.glitchActive ? 'rgba(255,0,80,0.5)' : undefined,
+                    color: interactiveState?.glitchActive ? '#ff4060' : undefined,
+                    background: interactiveState?.glitchActive ? 'rgba(255,0,80,0.15)' : undefined
+                  }}
+                >
+                  {interactiveState?.glitchActive ? '🔴 Glitch ON' : '⚫ Glitch OFF'}
+                </button>
+
+                <button
+                  onClick={() => onTriggerInteractive('CYBER_RESET', {})}
+                  className="btn-secondary"
+                  style={{ padding: '8px 12px' }}
+                  title="Reset cyber wave to defaults"
+                >
+                  <RotateCcw size={14} /> Reset
+                </button>
+              </div>
+            ) : (
+            /* ── Birthday Cake Controls ─────────────────────────────────── */
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <button
                 onClick={() => onTriggerInteractive('CAKE_CUT', { cutPosition: { x: 0.5, y: 0.5 } })}
@@ -135,6 +237,7 @@ export default function PlaybackControls({
                 <RotateCcw size={14} /> Reset
               </button>
             </div>
+            )
           ) : (
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               Static media active across all connected display phones.
@@ -166,7 +269,9 @@ export default function PlaybackControls({
 
           <button
             onClick={() => {
-              if (!document.fullscreenElement) {
+              if (onToggleFullscreen) {
+                onToggleFullscreen();
+              } else if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(console.warn);
               } else {
                 document.exitFullscreen().catch(console.warn);
@@ -174,7 +279,7 @@ export default function PlaybackControls({
             }}
             className="btn-secondary"
             style={{ padding: '8px 12px' }}
-            title="Toggle Fullscreen"
+            title="Toggle Fullscreen (Master & Display Screens)"
           >
             <Maximize2 size={16} />
           </button>

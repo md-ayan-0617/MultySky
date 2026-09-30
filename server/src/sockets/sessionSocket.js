@@ -91,6 +91,23 @@ export const registerSessionHandlers = (io, socket) => {
     }
   });
 
+  // End Session (FR-15)
+  socket.on('end-session', ({ sessionId }, callback) => {
+    const success = sessionService.endSession(sessionId);
+    if (success) {
+      io.to(`session:${sessionId}`).emit('session-ended', { sessionId });
+      if (callback) callback({ success: true });
+    } else if (callback) {
+      callback({ success: false, message: 'Session not found' });
+    }
+  });
+
+  // Master Fullscreen Request Broadcast (FR-11, FR-13)
+  socket.on('broadcast-fullscreen', ({ sessionId }, callback) => {
+    io.to(`session:${sessionId}`).emit('fullscreen-requested', {});
+    if (callback) callback({ success: true });
+  });
+
   // Device disconnect handling
   socket.on('disconnect', () => {
     if (socket.sessionId && socket.deviceId) {
