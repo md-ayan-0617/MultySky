@@ -1,0 +1,13 @@
+{
+  "name": "multiscreen-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MultiScreen - Web-Based Multi-Device Media Display Platform",
+  "scripts": {
+    "start": "node server/src/server.js",
+    "server": "node --watch server/src/server.js",
+    "client": "npm --prefix client run dev -- --host 0.0.0.0",
+    "dev": "node start-dev.js",
+    "build": "npm --prefix client run build"
+  }
+}
