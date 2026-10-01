@@ -49,26 +49,27 @@ export default function CreateSession({ onNavigate, onCreated }) {
         <ArrowLeft size={16} /> Back to Home
       </button>
 
-      <div className="glass-panel" style={{ padding: '36px' }}>
+      <div className="clay-card" style={{ padding: '36px 28px', background: 'var(--clay-surface)' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'var(--nm-surface-light)',
-            border: 'var(--border-subtle)',
+            background: 'var(--clay-surface-warm)',
+            border: '2px solid rgba(48, 45, 61, 0.05)',
             padding: '6px 16px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.85rem',
-            color: 'var(--accent-primary)',
+            fontWeight: 800,
+            color: 'var(--clay-coral)',
             marginBottom: '12px'
           }}>
             <Sparkles size={16} /> Session Setup & Grid Configuration
           </div>
-          <h2 style={{ fontSize: '2.2rem', color: 'var(--text-heading)', marginBottom: '8px' }}>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-heading)', marginBottom: '8px' }}>
             Create MultiScreen Session
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
             Configure 1 to 100 smartphones in an intelligent multi-screen video wall.
           </p>
         </div>

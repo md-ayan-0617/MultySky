@@ -168,6 +168,31 @@ export const registerSessionHandlers = (io, socket) => {
   socket.on('timer:reset', (data, cb) => handleTimer({ ...data, action: 'RESET' }, cb));
   socket.on('timer-control', handleTimer);
 
+  // Master Joining/Leaving Display Grid (Critical Functional Requirement)
+  socket.on('master:join-grid', ({ sessionId, preferredIndex = 0 }, callback) => {
+    const sId = sessionId || socket.sessionId;
+    const result = sessionService.joinMasterToGrid(sId, { preferredIndex });
+    if (result) {
+      io.to(`session:${sId}`).emit('session-updated', result.session);
+      io.to(`session:${sId}`).emit('master-grid-status', { joined: true, device: result.device });
+      if (callback) callback({ success: true, session: result.session, device: result.device });
+    } else if (callback) {
+      callback({ success: false, message: 'Session not found' });
+    }
+  });
+
+  socket.on('master:leave-grid', ({ sessionId }, callback) => {
+    const sId = sessionId || socket.sessionId;
+    const session = sessionService.leaveMasterFromGrid(sId);
+    if (session) {
+      io.to(`session:${sId}`).emit('session-updated', session);
+      io.to(`session:${sId}`).emit('master-grid-status', { joined: false });
+      if (callback) callback({ success: true, session });
+    } else if (callback) {
+      callback({ success: false, message: 'Session not found' });
+    }
+  });
+
   // Blackout Display (Requirement 8)
   socket.on('display:blackout', ({ sessionId, blackout }, callback) => {
     const session = sessionService.setBlackout(sessionId, blackout);

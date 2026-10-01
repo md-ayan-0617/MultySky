@@ -147,14 +147,33 @@ export default function MultiScreenSimulator({
                 >
                   {/* Slot Identifier */}
                   <div style={{
-                    fontWeight: 700,
+                    fontWeight: 800,
                     fontFamily: 'var(--font-mono)',
                     fontSize: totalSlots > 50 ? '0.62rem' : (totalSlots > 25 ? '0.72rem' : '0.85rem'),
                     color: pairedDevice ? 'var(--text-heading)' : 'var(--text-dim)',
-                    lineHeight: 1
+                    lineHeight: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}>
                     {pairedDevice?.deviceCode || slotCode}
                   </div>
+
+                  {/* Master phone indicator */}
+                  {pairedDevice?.isMaster && totalSlots <= 40 && (
+                    <span style={{
+                      fontSize: '0.58rem',
+                      fontWeight: 800,
+                      background: 'var(--clay-lavender)',
+                      color: '#271E47',
+                      padding: '1px 4px',
+                      borderRadius: '4px',
+                      marginTop: '2px',
+                      textTransform: 'uppercase'
+                    }}>
+                      MASTER
+                    </span>
+                  )}
 
                   {/* Status Indicator */}
                   <div style={{
@@ -170,11 +189,11 @@ export default function MultiScreenSimulator({
                     {totalSlots <= 36 && (
                       <span style={{
                         fontSize: '0.65rem',
-                        fontWeight: 600,
-                        color: pairedDevice ? (pairedDevice.status === 'pending' ? 'var(--accent-amber)' : 'var(--accent-emerald)') : 'var(--text-dim)',
+                        fontWeight: 700,
+                        color: pairedDevice ? (pairedDevice.status === 'pending' ? '#B45309' : '#15803D') : 'var(--text-dim)',
                         whiteSpace: 'nowrap'
                       }}>
-                        {pairedDevice ? (pairedDevice.status === 'pending' ? 'Pending' : 'Connected') : 'Empty'}
+                        {pairedDevice ? (pairedDevice.status === 'pending' ? 'Pending' : (pairedDevice.isMaster ? 'Master Display' : 'Connected')) : 'Empty'}
                       </span>
                     )}
                   </div>

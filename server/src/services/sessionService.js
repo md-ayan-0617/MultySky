@@ -189,6 +189,11 @@ export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socket
     }
   }
 
+  // Pure master controller alone does not take a display slot unless role is 'master+display'
+  if (role === 'master') {
+    return { device: { id: deviceId, name: deviceName, role: 'master', isMaster: true, status: 'ready' }, session };
+  }
+
   let existing = session.devices.find(d => d.id === deviceId);
 
   if (existing) {
@@ -223,6 +228,7 @@ export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socket
     deviceCode: `P${String(session.devices.length + 1).padStart(2, '0')}`,
     name: deviceName || `Phone ${session.devices.length + 1}`,
     role,
+    isMaster: role === 'master+display',
     socketId,
     userAgent,
     position: {
@@ -238,6 +244,71 @@ export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socket
 
   session.devices.push(newDevice);
   return { device: newDevice, session };
+};
+
+export const joinMasterToGrid = (sessionId, { preferredIndex = 0 } = {}) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+
+  const masterDevId = `master-disp-${session.id}`;
+  let existing = session.devices.find(d => d.id === masterDevId || d.isMaster);
+
+  const slotIdx = Math.max(0, Math.min(preferredIndex, session.layout.total - 1));
+  const row = Math.floor(slotIdx / session.layout.cols);
+  const col = slotIdx % session.layout.cols;
+
+  if (existing) {
+    existing.status = 'ready';
+    existing.role = 'master+display';
+    existing.isMaster = true;
+    existing.position = {
+      index: slotIdx,
+      row,
+      col,
+      label: getPositionLabel(row, col, session.layout.rows, session.layout.cols)
+    };
+    existing.lastSeen = Date.now();
+    session.masterJoinedGrid = true;
+    session.masterGridDeviceId = existing.id;
+    return { session, device: existing };
+  }
+
+  const masterDevice = {
+    id: masterDevId,
+    deviceCode: `P${String(slotIdx + 1).padStart(2, '0')}`,
+    name: 'Master Display (Host)',
+    role: 'master+display',
+    isMaster: true,
+    socketId: null,
+    position: {
+      index: slotIdx,
+      row,
+      col,
+      label: getPositionLabel(row, col, session.layout.rows, session.layout.cols)
+    },
+    status: 'ready',
+    joinedAt: new Date().toISOString(),
+    lastSeen: Date.now()
+  };
+
+  session.devices.unshift(masterDevice);
+  session.masterJoinedGrid = true;
+  session.masterGridDeviceId = masterDevice.id;
+  return { session, device: masterDevice };
+};
+
+export const leaveMasterFromGrid = (sessionId) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+
+  const masterDevId = `master-disp-${session.id}`;
+  const idx = session.devices.findIndex(d => d.id === masterDevId || d.isMaster);
+  if (idx !== -1) {
+    session.devices.splice(idx, 1);
+  }
+  session.masterJoinedGrid = false;
+  session.masterGridDeviceId = null;
+  return session;
 };
 
 export const approveDevice = (sessionId, deviceId) => {

@@ -51,13 +51,16 @@ function FloatingThemeToggle({ theme, onToggle }) {
   );
 }
 
+import Header from './components/Header';
+import Footer from './components/Footer';
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [routeParams, setRouteParams] = useState({});
 
-  // ── Theme state — persisted in localStorage ───────────────────────────────
+  // ── Theme state — default to warm playful clay (light) ──────────────────────
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('ms-theme') || 'dark';
+    return localStorage.getItem('ms-theme') || 'light';
   });
 
   // Apply data-theme to <body> and persist whenever theme changes
@@ -147,14 +150,18 @@ export default function App() {
     }
   };
 
-  // MasterDashboard has its own inline header toggle — don't show floating one there
-  const showFloatingToggle = currentPage !== 'master' && currentPage !== 'display';
+  const showHeaderFooter = currentPage === 'home' || currentPage === 'create' || currentPage === 'join';
 
   return (
     <div className="app-container">
-      {/* Global floating theme toggle (Home / Create / Join pages) */}
-      {showFloatingToggle && (
-        <FloatingThemeToggle theme={theme} onToggle={toggleTheme} />
+      {/* Polished Claymorphism Header */}
+      {showHeaderFooter && (
+        <Header
+          currentPage={currentPage}
+          onNavigate={navigate}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
       )}
 
       {currentPage === 'home' && (
@@ -200,6 +207,11 @@ export default function App() {
           deviceName={routeParams.deviceName}
           onNavigate={navigate}
         />
+      )}
+
+      {/* Polished Claymorphism Footer */}
+      {showHeaderFooter && (
+        <Footer onNavigate={navigate} />
       )}
     </div>
   );

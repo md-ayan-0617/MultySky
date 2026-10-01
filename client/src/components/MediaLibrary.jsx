@@ -153,16 +153,26 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
   }, [mediaItems, activeCategory, showFavoritesOnly, favorites, searchQuery, sortBy]);
 
   return (
-    <div className="glass-panel" style={{ padding: '24px' }}>
+    <div className="clay-card" style={{ padding: '24px', background: 'var(--clay-surface)' }}>
       {/* Top Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="nm-icon-box" style={{ width: '38px', height: '38px', color: 'var(--accent-pink)', background: 'var(--nm-surface-light)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '12px',
+            color: '#4A1A2E',
+            background: 'var(--clay-pink)',
+            boxShadow: 'var(--clay-shadow-pink)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
             <Sparkles size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)' }}>Media Library & Presets</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-heading)' }}>Media Library & Presets</h3>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
               Superheroes, Pop Culture, Birthday Cakes, Space & Viral Visuals
             </p>
           </div>

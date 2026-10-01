@@ -1,12 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Smartphone, ArrowLeft, ArrowRight, QrCode, Link as LinkIcon, Camera, KeyRound, Sparkles, Check, Upload, AlertCircle, Lock } from 'lucide-react';
+import {
+  Smartphone,
+  ArrowLeft,
+  ArrowRight,
+  QrCode,
+  Camera,
+  KeyRound,
+  Check,
+  Upload,
+  AlertCircle,
+  Lock,
+  RefreshCw,
+  Sparkles
+} from 'lucide-react';
 import { joinSession } from '../services/api';
 
 export default function JoinSession({ onNavigate, initialCode = '', onJoined }) {
-  // Join tabs: 'scan' | 'link' | 'code'
-  const [activeTab, setActiveTab] = useState('scan');
+  // Join tabs: 'scan' | 'code'
+  const [activeTab, setActiveTab] = useState(initialCode ? 'code' : 'scan');
   const [sessionCode, setSessionCode] = useState(initialCode);
-  const [joiningLink, setJoiningLink] = useState('');
   const [pin, setPin] = useState('');
   const [needPin, setNeedPin] = useState(false);
   const [deviceName, setDeviceName] = useState(() => {
@@ -18,11 +30,10 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState(null);
 
-  // Camera QR Scanner states
+  // Camera QR Scanner states: 'prompt' | 'starting' | 'active' | 'denied' | 'unavailable'
+  const [cameraState, setCameraState] = useState('prompt');
   const videoRef = useRef(null);
   const streamRef = useRef(null);
-  const [hasCamera, setHasCamera] = useState(true);
-  const [cameraActive, setCameraActive] = useState(false);
   const [scanMessage, setScanMessage] = useState('Point camera at the QR code on the Master screen');
 
   useEffect(() => {
@@ -32,7 +43,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
     }
   }, [initialCode]);
 
-  // Helper to extract session code from text/link
+  // Extract session code helper
   const extractCode = (str) => {
     if (!str) return '';
     const match = str.match(/MS-[A-Z0-9]{6}/i);
@@ -44,7 +55,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
     return clean;
   };
 
-  // Perform join action with a given code (Auto Reconnect & Re-use Device ID - Requirement 13)
+  // Perform join action with a given code (Auto Reconnect & Re-use Device ID)
   const executeJoin = async (targetCode) => {
     const finalCode = extractCode(targetCode);
     if (!finalCode) {
@@ -99,79 +110,87 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
       }
     } catch (err) {
       console.error(err);
-      setError('Could not connect to session. Ensure the master device is active.');
+      setError('Could not connect to session. Ensure the host screen is active.');
     } finally {
       setIsJoining(false);
     }
   };
 
-  // Camera Management
-  const startCamera = async () => {
+  // Start Camera with permission and device capability checks
+  const handleEnableCamera = async () => {
+    setError(null);
+    setCameraState('starting');
+
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setCameraState('unavailable');
+      return;
+    }
+
     try {
-      setError(null);
-      if (!navigator?.mediaDevices?.getUserMedia) {
-        setHasCamera(false);
-        return;
-      }
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } }
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
       });
+
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current.play().catch(() => {});
       }
-      setCameraActive(true);
-      setHasCamera(true);
+      setCameraState('active');
 
-      // Start barcode detection if BarcodeDetector API is supported
+      // Start BarcodeDetector if available
       if ('BarcodeDetector' in window) {
-        const barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
-        const scanInterval = setInterval(async () => {
-          if (!videoRef.current || videoRef.current.readyState < 2) return;
-          try {
-            const barcodes = await barcodeDetector.detect(videoRef.current);
-            if (barcodes.length > 0) {
-              const rawValue = barcodes[0].rawValue;
-              const detected = extractCode(rawValue);
-              if (detected) {
-                clearInterval(scanInterval);
-                setScanMessage(`Found code: ${detected}! Joining...`);
-                executeJoin(detected);
+        try {
+          const barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
+          const scanInterval = setInterval(async () => {
+            if (!videoRef.current || videoRef.current.readyState < 2) return;
+            try {
+              const barcodes = await barcodeDetector.detect(videoRef.current);
+              if (barcodes.length > 0) {
+                const detected = extractCode(barcodes[0].rawValue);
+                if (detected) {
+                  clearInterval(scanInterval);
+                  setScanMessage(`Found code: ${detected}! Connecting...`);
+                  executeJoin(detected);
+                }
               }
+            } catch (e) {
+              // Frame scan error, ignore and continue
             }
-          } catch (e) {
-            // Frame detection error, ignore and continue
-          }
-        }, 500);
+          }, 400);
 
-        return () => clearInterval(scanInterval);
+          return () => clearInterval(scanInterval);
+        } catch (e) {
+          console.warn('BarcodeDetector error:', e);
+        }
       }
     } catch (err) {
-      console.warn('Camera access denied or unavailable:', err);
-      setHasCamera(false);
-      setCameraActive(false);
+      console.warn('Camera access denied or failed:', err);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setCameraState('denied');
+      } else {
+        setCameraState('unavailable');
+      }
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
-    setCameraActive(false);
+    setCameraState('prompt');
   };
 
   useEffect(() => {
-    if (activeTab === 'scan') {
-      startCamera();
-    } else {
-      stopCamera();
-    }
     return () => stopCamera();
-  }, [activeTab]);
+  }, []);
 
-  // Handle file QR upload
+  // Handle uploaded image file
   const handleQrFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -196,86 +215,163 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
         setError('Error reading QR image.');
       }
     } else {
-      setError('Barcode detector is not supported in this browser. Please enter the session code manually.');
+      setError('Barcode detector not supported on this browser. Please enter the session code manually below.');
+      setActiveTab('code');
     }
   };
 
   return (
-    <div style={{ maxWidth: '520px', margin: '30px auto', padding: '0 20px' }}>
+    <div style={{ maxWidth: '520px', margin: '24px auto', padding: '0 20px 60px' }}>
       <button
         onClick={() => {
           stopCamera();
           onNavigate('home');
         }}
         className="btn-secondary"
-        style={{ marginBottom: '20px', padding: '8px 16px', fontSize: '0.85rem' }}
+        style={{
+          marginBottom: '20px',
+          padding: '8px 16px',
+          fontSize: '0.88rem',
+          borderRadius: 'var(--radius-sm)'
+        }}
       >
         <ArrowLeft size={16} /> Back to Home
       </button>
 
-      <div className="glass-panel" style={{ padding: '32px 24px', position: 'relative' }}>
+      <div
+        className="clay-card"
+        style={{
+          padding: '36px 26px',
+          background: 'var(--clay-surface)'
+        }}
+      >
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'var(--nm-surface-light)',
-            border: 'var(--border-subtle)',
-            padding: '6px 16px',
-            borderRadius: 'var(--radius-full)',
-            fontSize: '0.85rem',
-            color: 'var(--accent-cyan)',
-            marginBottom: '10px'
-          }}>
-            <Smartphone size={16} /> Pair Phone Screen
+          <div
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '18px',
+              background: 'var(--clay-coral)',
+              boxShadow: 'var(--clay-shadow-coral)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              margin: '0 auto 16px'
+            }}
+          >
+            <Smartphone size={28} strokeWidth={2.4} />
           </div>
-          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-heading)', marginBottom: '6px' }}>
-            Join Multi-Phone Wall
+
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-heading)', marginBottom: '6px' }}>
+            Join Display Wall
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Connect your smartphone into the synchronized visual wall
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
+            Connect this smartphone into the synchronized visual screen
           </p>
         </div>
 
-        {/* Error message */}
-        {error && (
-          <div style={{
-            background: 'rgba(244, 63, 94, 0.1)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            color: 'var(--accent-rose)',
-            padding: '12px 14px',
+        {/* Tab Controls (Scan QR vs Enter Code) */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '8px',
+            background: 'var(--clay-surface-warm)',
+            padding: '6px',
             borderRadius: 'var(--radius-md)',
-            marginBottom: '20px',
-            fontSize: '0.88rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <AlertCircle size={16} />
-            <span>{error}</span>
+            marginBottom: '24px'
+          }}
+        >
+          <button
+            onClick={() => {
+              setActiveTab('scan');
+              setError(null);
+            }}
+            style={{
+              padding: '10px 14px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.92rem',
+              fontWeight: 800,
+              background: activeTab === 'scan' ? 'var(--clay-coral)' : 'transparent',
+              color: activeTab === 'scan' ? '#ffffff' : 'var(--text-secondary)',
+              boxShadow: activeTab === 'scan' ? 'var(--clay-shadow-coral)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Camera size={16} /> Scan QR
+          </button>
+
+          <button
+            onClick={() => {
+              stopCamera();
+              setActiveTab('code');
+              setError(null);
+            }}
+            style={{
+              padding: '10px 14px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.92rem',
+              fontWeight: 800,
+              background: activeTab === 'code' ? 'var(--clay-coral)' : 'transparent',
+              color: activeTab === 'code' ? '#ffffff' : 'var(--text-secondary)',
+              boxShadow: activeTab === 'code' ? 'var(--clay-shadow-coral)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <KeyRound size={16} /> Enter Code
+          </button>
+        </div>
+
+        {/* Friendly Error Notice */}
+        {error && (
+          <div
+            style={{
+              background: '#FFF0ED',
+              border: '2px solid #FFC9C1',
+              color: '#E55341',
+              padding: '14px 16px',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: '20px',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+          >
+            <AlertCircle size={20} />
+            <div style={{ flex: 1, fontWeight: 600 }}>{error}</div>
           </div>
         )}
 
         {/* Device Nickname Input */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
+        <div style={{ marginBottom: '18px' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: 700 }}>
             Device Nickname
           </label>
           <input
             type="text"
-            placeholder="e.g. My iPhone / Screen 12"
+            placeholder="e.g. My iPhone / Left Screen"
             value={deviceName}
             onChange={(e) => setDeviceName(e.target.value)}
             className="input-control"
           />
         </div>
 
-        {/* Optional PIN Code (Requirement 14) */}
+        {/* Optional PIN Code */}
         {(needPin || activeTab === 'code') && (
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
-              <Lock size={14} color="var(--accent-amber)" /> Session PIN {needPin ? '(Required)' : '(If Protected)'}
+          <div style={{ marginBottom: '18px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: 700 }}>
+              <Lock size={15} color="var(--clay-coral)" /> Session PIN {needPin ? '(Required)' : '(If Protected)'}
             </label>
             <input
               type="text"
@@ -289,189 +385,199 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
           </div>
         )}
 
-        {/* ── TAB 1: SCAN QR CODE ──────────────────────────────────── */}
+        {/* ── TAB 1: SCAN QR CODE (Requirement 8 Camera Fix) ─────────────── */}
         {activeTab === 'scan' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{
-              width: '100%',
-              maxWidth: '320px',
-              height: '240px',
-              background: 'var(--nm-surface-dark)',
-              borderRadius: 'var(--radius-lg)',
-              position: 'relative',
-              overflow: 'hidden',
-              border: '2px solid var(--accent-cyan)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              boxShadow: 'var(--shadow-md)'
-            }}>
-              {cameraActive ? (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
-                  <Camera size={44} color="var(--text-dim)" style={{ margin: '0 auto 10px' }} />
-                  <p style={{ fontSize: '0.82rem', marginBottom: '12px' }}>
-                    {hasCamera ? 'Starting camera...' : 'Camera unavailable or permission denied'}
-                  </p>
-                  <label className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.8rem', cursor: 'pointer' }}>
-                    <Upload size={14} /> Upload QR Screenshot
-                    <input type="file" accept="image/*" onChange={handleQrFileUpload} style={{ display: 'none' }} />
-                  </label>
-                </div>
-              )}
-
-              {/* Viewfinder Reticle Overlay */}
-              <div style={{
-                position: 'absolute',
-                width: '180px',
-                height: '180px',
-                border: '2px solid var(--accent-cyan)',
-                borderRadius: '16px',
-                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.55)',
-                pointerEvents: 'none',
+            {/* Camera Viewport Container */}
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '340px',
+                height: '260px',
+                background: 'var(--clay-surface-warm)',
+                borderRadius: 'var(--radius-lg)',
+                position: 'relative',
+                overflow: 'hidden',
+                border: '2px solid rgba(48, 45, 61, 0.08)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '2px',
-                  background: 'var(--accent-cyan)',
-                  boxShadow: '0 0 8px var(--accent-cyan)'
-                }} />
-              </div>
+                justifyContent: 'center',
+                marginBottom: '18px',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              {cameraState === 'active' ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  {/* Viewfinder Target Reticle */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      width: '180px',
+                      height: '180px',
+                      border: '3px solid var(--clay-coral)',
+                      borderRadius: '20px',
+                      boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.55)',
+                      pointerEvents: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  />
+                </>
+              ) : cameraState === 'starting' ? (
+                <div style={{ textAlign: 'center', padding: '24px' }}>
+                  <RefreshCw size={36} color="var(--clay-coral)" style={{ animation: 'spin 1s linear infinite', margin: '0 auto 12px' }} />
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-heading)' }}>
+                    Starting camera...
+                  </div>
+                </div>
+              ) : cameraState === 'denied' ? (
+                /* Permission Denied UI (Requirement 8) */
+                <div style={{ textAlign: 'center', padding: '24px' }}>
+                  <AlertCircle size={44} color="#E55341" style={{ margin: '0 auto 12px' }} />
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#E55341', marginBottom: '8px' }}>
+                    Camera permission was denied.
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                    Please allow camera access in browser settings, or enter the session code manually.
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <button onClick={handleEnableCamera} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                      TRY AGAIN
+                    </button>
+                    <button onClick={() => setActiveTab('code')} className="btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                      ENTER SESSION CODE MANUALLY
+                    </button>
+                  </div>
+                </div>
+              ) : cameraState === 'unavailable' ? (
+                /* Camera Unavailable UI (Requirement 8) */
+                <div style={{ textAlign: 'center', padding: '24px' }}>
+                  <Camera size={44} color="var(--text-muted)" style={{ margin: '0 auto 12px' }} />
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-heading)', marginBottom: '8px' }}>
+                    Camera unavailable
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                    No camera device was detected on this browser.
+                  </p>
+                  <button onClick={() => setActiveTab('code')} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                    ENTER SESSION CODE MANUALLY
+                  </button>
+                </div>
+              ) : (
+                /* Initial Prompt State (Requirement 8) */
+                <div style={{ textAlign: 'center', padding: '24px' }}>
+                  <Camera size={44} color="var(--clay-coral)" style={{ margin: '0 auto 12px' }} />
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-heading)', marginBottom: '8px' }}>
+                    Allow camera access to scan the session QR.
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                    Scan the QR shown on the master screen to connect instantly.
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <button
+                      onClick={handleEnableCamera}
+                      className="btn-primary"
+                      style={{ padding: '10px 20px', fontSize: '0.9rem' }}
+                    >
+                      <Camera size={16} /> ENABLE CAMERA
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('code')}
+                      className="btn-secondary"
+                      style={{ padding: '10px 16px', fontSize: '0.85rem' }}
+                    >
+                      ENTER SESSION CODE MANUALLY
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <p style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', marginBottom: '18px', textAlign: 'center' }}>
-              {scanMessage}
-            </p>
+            {cameraState === 'active' && (
+              <p style={{ fontSize: '0.88rem', color: 'var(--clay-coral)', fontWeight: 700, marginBottom: '16px', textAlign: 'center' }}>
+                {scanMessage}
+              </p>
+            )}
+
+            {/* Optional screenshot upload fallback */}
+            <label
+              className="btn-secondary"
+              style={{
+                padding: '10px 18px',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '12px'
+              }}
+            >
+              <Upload size={16} /> Upload QR Screenshot
+              <input type="file" accept="image/*" onChange={handleQrFileUpload} style={{ display: 'none' }} />
+            </label>
           </div>
         )}
 
-        {/* ── TAB 2: JOIN WITH LINK ────────────────────────────────── */}
-        {activeTab === 'link' && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              executeJoin(joiningLink);
-            }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
-          >
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
-                Paste Session Link
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. https://multy-sky.vercel.app/?join=MS-7K9X48"
-                value={joiningLink}
-                onChange={(e) => setJoiningLink(e.target.value)}
-                required
-                className="input-control"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isJoining}
-              className="btn-primary"
-              style={{ padding: '12px', fontSize: '0.95rem' }}
-            >
-              {isJoining ? 'Joining...' : <>Join Session with Link <ArrowRight size={16} /></>}
-            </button>
-          </form>
-        )}
-
-        {/* ── TAB 3: ENTER SESSION ID ──────────────────────────────── */}
+        {/* ── TAB 2: ENTER CODE MANUALLY ─────────────────────────────────── */}
         {activeTab === 'code' && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
               executeJoin(sessionCode);
             }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
           >
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
-                Session ID / Code
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: 700 }}>
+                Session Code
               </label>
               <input
                 type="text"
-                placeholder="e.g. MS-7K9X48"
+                placeholder="e.g. MS-ABC123"
                 value={sessionCode}
                 onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-                required
                 className="input-control"
                 style={{
-                  fontSize: '1.3rem',
-                  fontFamily: 'var(--font-mono)',
-                  fontWeight: 700,
+                  fontSize: '1.2rem',
                   letterSpacing: '2px',
-                  textAlign: 'center'
+                  fontWeight: 800,
+                  fontFamily: 'var(--font-mono)',
+                  textAlign: 'center',
+                  textTransform: 'uppercase'
                 }}
+                required
               />
             </div>
 
             <button
               type="submit"
-              disabled={isJoining}
+              disabled={isJoining || !sessionCode.trim()}
               className="btn-primary"
-              style={{ padding: '12px', fontSize: '0.95rem' }}
+              style={{
+                width: '100%',
+                padding: '16px 24px',
+                fontSize: '1.05rem',
+                opacity: isJoining ? 0.7 : 1
+              }}
             >
-              {isJoining ? 'Connecting to Wall...' : <>Join Session <ArrowRight size={16} /></>}
+              {isJoining ? 'Connecting your phone...' : 'CONNECT TO SESSION'}
             </button>
           </form>
         )}
-
-        {/* ── 3 Bottom Switching Tabs ──────────────────────────────── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '8px',
-          marginTop: '24px',
-          paddingTop: '16px',
-          borderTop: 'var(--border-subtle)'
-        }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab('scan')}
-            className={activeTab === 'scan' ? 'btn-primary' : 'btn-secondary'}
-            style={{ padding: '8px 4px', fontSize: '0.78rem', flexDirection: 'column', gap: '4px' }}
-          >
-            <QrCode size={15} />
-            <span>Scan QR</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('link')}
-            className={activeTab === 'link' ? 'btn-primary' : 'btn-secondary'}
-            style={{ padding: '8px 4px', fontSize: '0.78rem', flexDirection: 'column', gap: '4px' }}
-          >
-            <LinkIcon size={15} />
-            <span>Join Link</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('code')}
-            className={activeTab === 'code' ? 'btn-primary' : 'btn-secondary'}
-            style={{ padding: '8px 4px', fontSize: '0.78rem', flexDirection: 'column', gap: '4px' }}
-          >
-            <KeyRound size={15} />
-            <span>Enter ID</span>
-          </button>
-        </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

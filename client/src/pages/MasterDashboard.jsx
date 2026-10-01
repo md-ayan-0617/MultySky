@@ -64,6 +64,30 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
   const connectedCount = devices.filter(d => d.status === 'ready').length;
   const pendingDevices = devices.filter(d => d.status === 'pending');
 
+  // Master Grid Display Integration (Requirement 1, 2, 3)
+  const masterDisplayDevice = devices.find(d => d.isMaster && d.status !== 'disconnected');
+  const isMasterInGrid = !!masterDisplayDevice || !!session?.masterJoinedGrid;
+
+  const handleMasterJoinGrid = (preferredIndex = 0) => {
+    if (socket) {
+      socket.emit('master:join-grid', { sessionId, preferredIndex });
+    }
+  };
+
+  const handleMasterLeaveGrid = () => {
+    if (socket) {
+      socket.emit('master:leave-grid', { sessionId });
+    }
+  };
+
+  const handleOpenMasterDisplay = () => {
+    onNavigate('display', {
+      sessionId,
+      deviceId: masterDisplayDevice?.id || `master-disp-${sessionId}`,
+      deviceName: 'Master Display (Host)'
+    });
+  };
+
   // Socket handlers
   const handleSelectLayout = (layout) => {
     const layoutId = typeof layout === 'object' ? layout.id : layout;
@@ -299,6 +323,31 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
 
           {/* Quick Global Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            {isMasterInGrid ? (
+              <button
+                onClick={handleOpenMasterDisplay}
+                className="btn-primary"
+                style={{
+                  padding: '8px 14px',
+                  fontSize: '0.85rem',
+                  background: 'var(--clay-lavender)',
+                  color: '#271E47',
+                  boxShadow: 'var(--clay-shadow-lavender)'
+                }}
+              >
+                <Maximize2 size={15} /> Open Display Mode
+              </button>
+            ) : (
+              <button
+                onClick={() => handleMasterJoinGrid(0)}
+                className="btn-secondary"
+                style={{ padding: '8px 14px', fontSize: '0.85rem' }}
+                title="Use this master phone as one of the physical screens in the grid"
+              >
+                <Smartphone size={15} color="var(--clay-coral)" /> Join Grid
+              </button>
+            )}
+
             <button
               onClick={handleToggleBlackout}
               className="btn-secondary"
@@ -384,6 +433,151 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
       {/* ── Main Dashboard Body ──────────────────────────────────────────── */}
       <main style={{ maxWidth: '1440px', margin: '24px auto', padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
+        {/* Master Phone Grid Banner (Requirement 1, 2, 3) */}
+        {isMasterInGrid ? (
+          <div
+            className="clay-card clay-card-mint animate-fade-in"
+            style={{
+              padding: '18px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '14px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '14px',
+                background: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#144026',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <Check size={24} strokeWidth={2.8} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 900, fontSize: '1.2rem', color: '#144026' }}>
+                    {masterDisplayDevice?.deviceCode || 'P01'} ● MASTER DISPLAY
+                  </span>
+                  <span className="badge badge-ready" style={{ background: '#FFFFFF', color: '#166534', padding: '3px 12px' }}>
+                    ✓ IN GRID
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.88rem', color: '#195431', marginTop: '2px', fontWeight: 600 }}>
+                  Position: {masterDisplayDevice?.position?.label || 'Slot 1'} • Active in synchronized playback & cake countdown
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              {/* Slot Selector */}
+              <select
+                value={masterDisplayDevice?.position?.index ?? 0}
+                onChange={(e) => handleUpdatePosition(masterDisplayDevice.id, parseInt(e.target.value, 10))}
+                style={{
+                  padding: '9px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: '#FFFFFF',
+                  border: '2px solid rgba(20, 64, 38, 0.2)',
+                  color: '#144026',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                {Array.from({ length: totalSlots }).map((_, sIdx) => (
+                  <option key={sIdx} value={sIdx}>
+                    Move to Slot P{String(sIdx + 1).padStart(2, '0')}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={handleOpenMasterDisplay}
+                className="btn-primary"
+                style={{
+                  background: '#144026',
+                  color: '#FFFFFF',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: '0 6px 14px -2px rgba(20, 64, 38, 0.4)'
+                }}
+              >
+                <Maximize2 size={16} /> ENTER DISPLAY MODE
+              </button>
+
+              <button
+                onClick={handleMasterLeaveGrid}
+                className="btn-secondary"
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.88rem'
+                }}
+                title="Remove Master from display grid while keeping controller and session alive"
+              >
+                <X size={16} /> LEAVE GRID
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="clay-card clay-card-lavender animate-fade-in"
+            style={{
+              padding: '18px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '14px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '14px',
+                background: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#271E47',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <Smartphone size={22} strokeWidth={2.4} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 900, fontSize: '1.15rem', color: '#271E47' }}>
+                  Use This Master Phone as a Screen in the Grid
+                </div>
+                <div style={{ fontSize: '0.88rem', color: '#3A2E63', marginTop: '2px' }}>
+                  Participate as physical screen P01 in synchronized videos, photos, and cake timers while retaining full controller access.
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => handleMasterJoinGrid(0)}
+              className="btn-primary"
+              style={{
+                background: '#271E47',
+                color: '#FFFFFF',
+                padding: '12px 24px',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 8px 18px -4px rgba(39, 30, 71, 0.45)'
+              }}
+            >
+              <Smartphone size={18} /> JOIN GRID
+            </button>
+          </div>
+        )}
+
         {/* Row 1: Live Simulator Wall (Centerpiece Showcase, Scalable 1-100) */}
         <MultiScreenSimulator
           layout={currentLayout}

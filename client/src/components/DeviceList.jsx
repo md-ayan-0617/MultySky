@@ -197,13 +197,26 @@ export default function DeviceList({
                   </div>
 
                   <div>
-                    <div style={{ fontWeight: 600, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem' }}>
+                    <div style={{ fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
                       {device.name || `Phone ${posIndex + 1}`}
                       <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
                         ({device.deviceCode || `P${String(posIndex + 1).padStart(2, '0')}`})
                       </span>
+                      {device.isMaster && (
+                        <span style={{
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          background: 'var(--clay-lavender)',
+                          color: '#271E47',
+                          padding: '2px 8px',
+                          borderRadius: 'var(--radius-full)',
+                          letterSpacing: '0.04em'
+                        }}>
+                          MASTER DISPLAY
+                        </span>
+                      )}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-secondary)' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--clay-coral)', fontWeight: 600 }}>
                       {device.position?.label || `Slot ${posIndex + 1}`}
                     </div>
                   </div>

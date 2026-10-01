@@ -33,28 +33,33 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '24px' }}>
+    <div className="clay-card" style={{ padding: '24px', background: 'var(--clay-surface)' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div className="nm-icon-box" style={{
-            width: '38px',
-            height: '38px',
-            color: 'var(--accent-primary)',
-            background: 'var(--nm-surface-light)'
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '12px',
+            color: '#271E47',
+            background: 'var(--clay-lavender)',
+            boxShadow: 'var(--clay-shadow-lavender)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            <Grid size={20} />
+            <Grid size={22} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)' }}>Screen Grid Configuration</h3>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-heading)' }}>Screen Grid Configuration</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               Configure 1 to 100 smartphone screens in a synchronized visual wall
             </p>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="badge badge-ready" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
+          <span className="badge badge-ready" style={{ fontSize: '0.82rem', padding: '6px 14px' }}>
             Active: {currentLayout?.rows || 2} × {currentLayout?.cols || 2} ({currentLayout?.total || 4} Phones)
           </span>
         </div>
@@ -64,38 +69,40 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
       <div style={{
         display: 'flex',
         gap: '6px',
-        padding: '4px',
-        background: 'var(--nm-surface-dark)',
+        padding: '6px',
+        background: 'var(--clay-surface-warm)',
         borderRadius: 'var(--radius-md)',
         marginBottom: '20px',
-        border: 'var(--border-subtle)'
+        border: '2px solid rgba(48, 45, 61, 0.05)'
       }}>
         <button
           onClick={() => setActiveTab('standard')}
-          className={activeTab === 'standard' ? 'nm-tab-active' : ''}
           style={{
             flex: 1,
-            padding: '8px 14px',
+            padding: '10px 14px',
             borderRadius: 'var(--radius-sm)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            color: activeTab === 'standard' ? '#ffffff' : 'var(--text-muted)',
+            fontSize: '0.9rem',
+            fontWeight: 800,
+            background: activeTab === 'standard' ? 'var(--clay-coral)' : 'transparent',
+            color: activeTab === 'standard' ? '#ffffff' : 'var(--text-secondary)',
+            boxShadow: activeTab === 'standard' ? 'var(--clay-shadow-coral)' : 'none',
             transition: 'all 0.2s ease'
           }}
         >
-          Standard Layouts (1–9)
+          Standard (1–9)
         </button>
 
         <button
           onClick={() => setActiveTab('more')}
-          className={activeTab === 'more' ? 'nm-tab-active' : ''}
           style={{
             flex: 1,
-            padding: '8px 14px',
+            padding: '10px 14px',
             borderRadius: 'var(--radius-sm)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            color: activeTab === 'more' ? '#ffffff' : 'var(--text-muted)',
+            fontSize: '0.9rem',
+            fontWeight: 800,
+            background: activeTab === 'more' ? 'var(--clay-coral)' : 'transparent',
+            color: activeTab === 'more' ? '#ffffff' : 'var(--text-secondary)',
+            boxShadow: activeTab === 'more' ? 'var(--clay-shadow-coral)' : 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -103,19 +110,20 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
             transition: 'all 0.2s ease'
           }}
         >
-          <Layers size={15} /> MORE GRIDS (10–100)
+          <Layers size={16} /> MORE GRIDS (10–100)
         </button>
 
         <button
           onClick={() => setActiveTab('custom')}
-          className={activeTab === 'custom' ? 'nm-tab-active' : ''}
           style={{
             flex: 1,
-            padding: '8px 14px',
+            padding: '10px 14px',
             borderRadius: 'var(--radius-sm)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            color: activeTab === 'custom' ? '#ffffff' : 'var(--text-muted)',
+            fontSize: '0.9rem',
+            fontWeight: 800,
+            background: activeTab === 'custom' ? 'var(--clay-coral)' : 'transparent',
+            color: activeTab === 'custom' ? '#ffffff' : 'var(--text-secondary)',
+            boxShadow: activeTab === 'custom' ? 'var(--clay-shadow-coral)' : 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -123,7 +131,7 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
             transition: 'all 0.2s ease'
           }}
         >
-          <Sliders size={15} /> Custom Grid
+          <Sliders size={16} /> Custom Grid
         </button>
       </div>
 
@@ -131,7 +139,7 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
       {activeTab === 'standard' && (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))',
           gap: '12px'
         }}>
           {STANDARD_LAYOUTS.map((item) => {
@@ -141,8 +149,8 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                 key={item.id}
                 onClick={() => onSelectLayout(item)}
                 style={{
-                  background: isSelected ? 'var(--nm-surface-light)' : 'var(--nm-surface)',
-                  border: isSelected ? '2px solid var(--accent-primary)' : 'var(--border-card)',
+                  background: 'var(--clay-surface)',
+                  border: isSelected ? '2px solid var(--clay-coral)' : '2px solid rgba(48, 45, 61, 0.06)',
                   borderRadius: 'var(--radius-md)',
                   padding: '16px 12px',
                   display: 'flex',
@@ -150,7 +158,8 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                   alignItems: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)'
+                  boxShadow: isSelected ? 'var(--clay-shadow-coral)' : 'var(--shadow-sm)',
+                  transform: isSelected ? 'translateY(-2px)' : 'none'
                 }}
               >
                 {/* Visual Mini Layout Grid */}
@@ -161,23 +170,23 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                   gap: '3px',
                   width: '56px',
                   height: '42px',
-                  background: 'var(--nm-surface-dark)',
+                  background: 'var(--clay-surface-warm)',
                   padding: '4px',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   marginBottom: '10px',
-                  border: 'var(--border-subtle)'
+                  border: '1.5px solid rgba(48, 45, 61, 0.05)'
                 }}>
                   {Array.from({ length: item.rows * item.cols }).map((_, idx) => (
                     <div
                       key={idx}
                       style={{
-                        background: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)',
-                        borderRadius: '2px',
+                        background: isSelected ? 'var(--clay-coral)' : 'var(--text-muted)',
+                        borderRadius: '3px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '0.65rem',
-                        fontWeight: 700,
+                        fontWeight: 800,
                         color: '#fff',
                         opacity: isSelected ? 1 : 0.4
                       }}
@@ -187,10 +196,10 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                   ))}
                 </div>
 
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: isSelected ? 'var(--text-heading)' : 'var(--text-main)' }}>
+                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: isSelected ? 'var(--clay-coral)' : 'var(--text-heading)' }}>
                   {item.name}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', fontWeight: 600 }}>
                   {item.desc}
                 </div>
               </div>
