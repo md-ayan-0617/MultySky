@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
-export default function AdminLayout() {
+export default function AdminLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { logout } = useAdminAuth();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function AdminLayout() {
           <div className="admin-logo-badge">
             <Shield size={18} />
           </div>
-          <span className="admin-brand-title">MultiScreen CMS</span>
+          <span className="admin-brand-title">Multy-sky CMS</span>
         </div>
 
         <div className="admin-mobile-actions">
@@ -124,7 +124,7 @@ export default function AdminLayout() {
             <Shield size={20} />
           </div>
           <div>
-            <div className="sidebar-brand-title">MultiScreen</div>
+            <div className="sidebar-brand-title">Multy-sky</div>
             <div className="sidebar-brand-sub">Gallery CMS Admin</div>
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function AdminLayout() {
 
       {/* ── Main Content Area ──────────────────────────────────────────── */}
       <main className="admin-main-viewport">
-        <Outlet />
+        {children || <Outlet />}
       </main>
     </div>
   );

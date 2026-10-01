@@ -167,18 +167,7 @@ export default function PlaybackControls({
                   ))}
                 </div>
 
-                {/* Ripple Burst & Glitch */}
-                <button
-                  onClick={() => onTriggerInteractive('CYBER_RIPPLE', { globalX: 0, globalY: 0, t: Date.now() })}
-                  className="btn-primary"
-                  style={{
-                    background: 'linear-gradient(135deg, #00bfff, #6610f2)',
-                    boxShadow: '4px 4px 12px var(--nm-dark-shadow), -4px -4px 12px var(--nm-light-shadow), 0 4px 15px rgba(0,191,255,0.4)',
-                    padding: '8px 16px'
-                  }}
-                >
-                  <Zap size={16} /> Ripple Burst ⚡
-                </button>
+                {/* Glitch & Reset */}
 
                 <button
                   onClick={() => onTriggerInteractive('CYBER_GLITCH', { active: !interactiveState?.glitchActive })}

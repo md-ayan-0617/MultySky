@@ -24,7 +24,7 @@ export default function SessionControlPanel({
             <Smartphone size={18} strokeWidth={2.5} />
           </div>
           <div className="session-title-block">
-            <span className="session-brand-name">MultiScreen</span>
+            <span className="session-brand-name">Multy-sky</span>
             <div className="session-code-pill">
               <span className="code-label">SESSION</span>
               <span className="code-value">{sessionId}</span>

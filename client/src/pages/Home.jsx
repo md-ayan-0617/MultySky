@@ -120,13 +120,13 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             padding: '8px 22px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.9rem',
-            color: 'var(--clay-coral)',
+            color: 'var(--accent-primary, #2563EB)',
             fontWeight: 800,
             boxShadow: 'var(--shadow-sm)',
             marginBottom: '28px'
           }}
         >
-          <Sparkles size={16} /> 100-Phone Multi-Device Display Platform
+          <Sparkles size={16} /> Multy-sky
         </div>
 
         {/* Hero Headline */}
@@ -139,8 +139,8 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             color: 'var(--text-heading)'
           }}
         >
-          Turn Your Phones Into <br />
-          <span style={{ color: 'var(--clay-coral)' }}>One Giant Screen</span>
+          Multy-sky <br />
+          <span style={{ color: 'var(--accent-primary, #2563EB)' }}>One Giant Screen</span>
         </h1>
 
         {/* Subtle Animated Subtitle */}
@@ -444,7 +444,7 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             Simple 3-Step Setup
           </div>
           <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-heading)', marginTop: '6px' }}>
-            How MultiScreen Works
+            How It Works
           </h2>
         </div>
 
@@ -1012,7 +1012,7 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             Versatile Experiences
           </div>
           <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-heading)', marginTop: '6px' }}>
-            Where to Use MultiScreen
+            Use Cases
           </h2>
         </div>
 
@@ -1093,11 +1093,11 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             },
             {
               q: 'How many phones can connect in one session?',
-              a: 'MultiScreen supports anywhere from 2 phones (1x2) up to 100 physical smartphones (10x10) simultaneously, with smart responsive grid scaling.'
+              a: 'Multy-sky supports anywhere from 2 phones (1x2) up to 100 physical smartphones (10x10) simultaneously, with smart responsive grid scaling.'
             },
             {
               q: 'Will the screens turn off during the show?',
-              a: 'No! When phones enter Display Mode, MultiScreen automatically activates the Screen Wake Lock API to prevent the display from sleeping or dimming.'
+              a: 'No! When phones enter Display Mode, Multy-sky automatically activates the Screen Wake Lock API to prevent the display from sleeping or dimming.'
             }
           ].map((faq, i) => (
             <div

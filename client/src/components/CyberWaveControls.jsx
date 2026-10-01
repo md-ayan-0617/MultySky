@@ -9,18 +9,17 @@ export default function CyberWaveControls({
     waveColor = '#3B82F6',
     waveSpeed = 1.0,
     waveIntensity = 1.0,
-    textSize = 30,
     glowBrightness = 1.2,
     glitchActive = false
   } = interactiveState;
 
   const colorOptions = [
-    { color: '#3B82F6', label: 'Cyber Blue' },
-    { color: '#60A5FA', label: 'Sky Glow' },
-    { color: '#00F5D4', label: 'Neon Teal' },
-    { color: '#A855F7', label: 'Purple Pulse' },
-    { color: '#EC4899', label: 'Hot Pink' },
-    { color: '#FFFFFF', label: 'Pure White' }
+    { color: '#3B82F6', label: 'Blue' },
+    { color: '#60A5FA', label: 'Sky' },
+    { color: '#00F5D4', label: 'Teal' },
+    { color: '#A855F7', label: 'Purple' },
+    { color: '#EC4899', label: 'Pink' },
+    { color: '#FFFFFF', label: 'White' }
   ];
 
   return (
@@ -30,16 +29,16 @@ export default function CyberWaveControls({
           <div className="cyber-icon-badge">
             <Sliders size={16} />
           </div>
-          <div>
-            <h4 className="cyber-controls-title">Cyber Wave Matrix Controls</h4>
-            <p className="cyber-controls-sub">Fine-tune wave frequency, glow, and particle intensity</p>
-          </div>
+          <h4 className="cyber-controls-title">Cyber Wave Controls</h4>
         </div>
 
         <button
-          onClick={() => onTriggerInteractive('CYBER_RESET', {})}
+          onClick={() => {
+            onTriggerInteractive('CYBER_RESET', {});
+            onTriggerInteractive('CUSTOM_TEXT', { text: '' });
+          }}
           className="cyber-reset-btn"
-          title="Reset to default settings"
+          title="Reset"
         >
           <RotateCcw size={13} />
           <span>Reset</span>
@@ -47,6 +46,35 @@ export default function CyberWaveControls({
       </div>
 
       <div className="cyber-controls-grid">
+        {/* Optional Typing Text Input (Requirement 3) */}
+        <div className="control-setting-box" style={{ gridColumn: '1 / -1' }}>
+          <div className="control-setting-label">
+            <span>Matrix Text (Optional)</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              type="text"
+              maxLength={40}
+              placeholder="Leave empty or enter text for typing animation..."
+              value={interactiveState?.customText || ''}
+              onChange={(e) => onTriggerInteractive('CUSTOM_TEXT', { text: e.target.value })}
+              className="admin-input"
+              style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+            />
+            {interactiveState?.customText ? (
+              <button
+                type="button"
+                onClick={() => onTriggerInteractive('CUSTOM_TEXT', { text: '' })}
+                className="btn-secondary"
+                style={{ padding: '8px 12px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                title="Clear text"
+              >
+                Clear
+              </button>
+            ) : null}
+          </div>
+        </div>
+
         {/* 1. Color Palette Presets */}
         <div className="control-setting-box">
           <div className="control-setting-label">
@@ -70,7 +98,7 @@ export default function CyberWaveControls({
         <div className="control-setting-box">
           <div className="control-setting-label">
             <Zap size={14} />
-            <span>Wave Speed: {waveSpeed.toFixed(1)}×</span>
+            <span>Speed: {waveSpeed.toFixed(1)}×</span>
           </div>
           <div className="segmented-pill-row">
             {[0.5, 1.0, 2.0, 3.5].map((spd) => (
@@ -89,7 +117,7 @@ export default function CyberWaveControls({
         <div className="control-setting-box">
           <div className="control-setting-label">
             <Activity size={14} />
-            <span>Wave Intensity: {Math.round(waveIntensity * 100)}%</span>
+            <span>Intensity: {Math.round(waveIntensity * 100)}%</span>
           </div>
           <input
             type="range"
@@ -106,7 +134,7 @@ export default function CyberWaveControls({
         <div className="control-setting-box">
           <div className="control-setting-label">
             <Sun size={14} />
-            <span>Glow / Brightness: {Math.round(glowBrightness * 100)}%</span>
+            <span>Glow: {Math.round(glowBrightness * 100)}%</span>
           </div>
           <input
             type="range"
@@ -119,27 +147,19 @@ export default function CyberWaveControls({
           />
         </div>
 
-        {/* 5. Interactive Pulse & Glitch Action Buttons */}
-        <div className="control-setting-box actions-box">
+        {/* 5. Glitch Toggle (without ripple pulse) */}
+        <div className="control-setting-box">
           <div className="control-setting-label">
             <Zap size={14} />
-            <span>Live FX Triggers</span>
+            <span>FX</span>
           </div>
-          <div className="fx-buttons-row">
-            <button
-              onClick={() => onTriggerInteractive('CYBER_RIPPLE', { globalX: 0, globalY: 0, t: Date.now() })}
-              className="btn-primary fx-btn"
-            >
-              <Zap size={14} /> Ripple Burst ⚡
-            </button>
-
-            <button
-              onClick={() => onTriggerInteractive('CYBER_GLITCH', { active: !glitchActive })}
-              className={`btn-secondary fx-btn ${glitchActive ? 'glitch-active' : ''}`}
-            >
-              {glitchActive ? '🔴 Glitch ON' : '⚡ Glitch FX'}
-            </button>
-          </div>
+          <button
+            onClick={() => onTriggerInteractive('CYBER_GLITCH', { active: !glitchActive })}
+            className={`btn-secondary fx-btn ${glitchActive ? 'glitch-active' : ''}`}
+            style={{ width: '100%', padding: '8px', fontSize: '0.82rem' }}
+          >
+            {glitchActive ? 'Glitch ON' : 'Glitch FX'}
+          </button>
         </div>
       </div>
     </div>

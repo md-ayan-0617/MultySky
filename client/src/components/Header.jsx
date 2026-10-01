@@ -25,19 +25,18 @@ export default function Header({ currentPage, onNavigate, theme, onToggleTheme }
   return (
     <header className="app-header">
       <div className="header-inner">
-        {/* Left: Compact Brand & Logo */}
+        {/* Left: Logo Only (No text beside logo) */}
         <div
           className="header-brand"
           onClick={() => handleNav('home')}
-          title="MultiScreen Home"
+          title="Multy-sky"
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
-          <div className="header-logo-icon">
-            <Smartphone size={18} strokeWidth={2.4} />
-          </div>
-          <div className="header-brand-text">
-            <span className="brand-title">MultiScreen</span>
-            <span className="brand-subtitle">Giant Display Wall</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Multy-sky Logo"
+            className="header-logo-img"
+          />
         </div>
 
         {/* Center: Desktop Navigation Links */}

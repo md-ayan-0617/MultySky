@@ -186,33 +186,41 @@ export default function CyberWave({
         ctx.shadowBlur = 0;
       });
 
-      // ── Animated User-Controlled Text Across Grid (Requirement 9) ─────────
-      const displayText = interactiveState?.customText || 'MULTISCREEN CYBER MATRIX';
-      if (displayText && displayText.trim()) {
+      // ── Clean Typing Animation for User-Controlled Text (Requirement 3) ─────
+      const rawText = (interactiveState?.customText && typeof interactiveState.customText === 'string') 
+        ? interactiveState.customText.trim() 
+        : '';
+
+      if (rawText) {
         ctx.save();
-        const baseFontSize = (interactiveState?.textSize || 30);
-        ctx.font = `900 ${baseFontSize}px "JetBrains Mono", monospace, sans-serif`;
+        const baseFontSize = Math.max(16, Math.min(52, interactiveState?.textSize || 32));
+        ctx.font = `800 ${baseFontSize}px "Nunito", "Outfit", -apple-system, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        const glowMultiplier = interactiveState?.glowBrightness || 1.2;
-        ctx.shadowColor = `rgba(${r},${g},${b},0.8)`;
-        ctx.shadowBlur = Math.round(12 * glowMultiplier);
+        // Typing effect: characters appear one by one with a blinking cursor
+        const charsCount = rawText.length;
+        const typeSpeed = 6; // characters per second
+        const holdTime = 2.5; // hold completed text for 2.5s before restarting
+        const cycleDuration = (charsCount / typeSpeed) + holdTime;
+        const cycleTime = t % cycleDuration;
+        const visibleChars = Math.min(charsCount, Math.floor(cycleTime * typeSpeed));
+        const typedPart = rawText.substring(0, visibleChars);
+        const cursorBlink = Math.floor(t * 2) % 2 === 0;
+        const textToDraw = typedPart + (cursorBlink ? '|' : ' ');
 
-        // Smooth wave distortion and movement across the whole wall
-        const speedFactor = speed * 60;
-        const cycleWidth = GLOBAL_W + 600;
-        const globalTextX = ((t * speedFactor) % cycleWidth) - 300;
-        const localTextX = globalTextX - offsetX + W / 2;
-        const localTextY = H / 2 + Math.sin(t * 2.5 + col) * (8 * (interactiveState?.waveIntensity || 1));
+        // Centered across the whole display matrix
+        const globalCenterX = GLOBAL_W / 2;
+        const globalCenterY = GLOBAL_H / 2;
+        const localX = globalCenterX - offsetX;
+        const localY = globalCenterY - offsetY;
 
-        // Text fill with bright cyan/blue highlight
-        ctx.fillStyle = `rgba(255, 255, 255, 0.95)`;
-        ctx.fillText(displayText.toUpperCase(), localTextX, localTextY);
+        // Subtle blue glow
+        ctx.shadowColor = 'rgba(59, 130, 246, 0.75)';
+        ctx.shadowBlur = 12;
 
-        ctx.strokeStyle = `rgba(${r},${g},${b},0.7)`;
-        ctx.lineWidth = 1;
-        ctx.strokeText(displayText.toUpperCase(), localTextX, localTextY);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(textToDraw, localX, localY);
 
         ctx.restore();
       }
@@ -313,31 +321,6 @@ export default function CyberWave({
         ref={canvasRef}
         style={{ width: '100%', height: '100%', display: 'block' }}
       />
-
-      {/* Hint overlay for actual phone screens */}
-      {!isSimulator && (
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(0, 5, 16, 0.8)',
-          backdropFilter: 'blur(8px)',
-          color: `${waveColor}`,
-          padding: '8px 18px',
-          borderRadius: '20px',
-          fontSize: '0.78rem',
-          pointerEvents: 'none',
-          zIndex: 50,
-          whiteSpace: 'nowrap',
-          border: `1px solid ${waveColor}40`,
-          fontFamily: 'monospace',
-          letterSpacing: '0.05em',
-          textShadow: `0 0 8px ${waveColor}`
-        }}>
-          ⚡ Tap to send ripple pulse across all screens
-        </div>
-      )}
     </div>
   );
 }

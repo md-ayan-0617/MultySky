@@ -486,7 +486,7 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
                   textAlign: 'center'
                 }}
               >
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>Connected to MultiScreen</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>Connected to Multy-sky</div>
                 <div style={{ fontSize: '0.9rem', color: 'var(--clay-yellow)', marginTop: '4px', fontWeight: 700 }}>
                   Assigned Slot {slotNumber} ({phoneLabel})
                 </div>

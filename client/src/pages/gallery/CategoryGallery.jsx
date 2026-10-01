@@ -142,19 +142,15 @@ export default function CategoryGallery() {
                       className="image-card-thumb"
                       loading="lazy"
                     />
-                    <div className="image-hover-overlay">
-                      <div className="hover-action-pill">
-                        <Maximize2 size={16} />
-                        <span>Preview Fullscreen</span>
-                      </div>
+                  </div>
+                  {(img.title || img.description) && (
+                    <div className="image-card-meta">
+                      {img.title && <h4 className="image-card-title">{img.title}</h4>}
+                      {img.description && (
+                        <p className="image-card-sub">{img.description}</p>
+                      )}
                     </div>
-                  </div>
-                  <div className="image-card-meta">
-                    <h4 className="image-card-title">{img.title || 'Untitled Image'}</h4>
-                    {img.description && (
-                      <p className="image-card-sub">{img.description}</p>
-                    )}
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -197,13 +193,15 @@ export default function CategoryGallery() {
               )}
             </div>
 
-            {/* Bottom Caption */}
-            <div className="lightbox-caption">
-              <h3 className="caption-title">{activeImage.title || 'Untitled Image'}</h3>
-              {activeImage.description && (
-                <p className="caption-desc">{activeImage.description}</p>
-              )}
-            </div>
+            {/* Bottom Caption (Only when user-provided title/description exists) */}
+            {(activeImage.title || activeImage.description) && (
+              <div className="lightbox-caption">
+                {activeImage.title && <h3 className="caption-title">{activeImage.title}</h3>}
+                {activeImage.description && (
+                  <p className="caption-desc">{activeImage.description}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -54,10 +54,10 @@ export default function CreateSession({ onNavigate, onCreated }) {
             <Sparkles size={16} /> Session Setup & Grid Configuration
           </div>
           <h2 className="create-title">
-            Create MultiScreen Session
+            Create Session
           </h2>
           <p className="create-subtitle">
-            Configure 1 to 100 smartphones in an intelligent multi-screen video wall.
+            Configure 1 to 100 smartphones in an intelligent multi-screen display wall.
           </p>
         </div>
 

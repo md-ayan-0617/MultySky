@@ -56,7 +56,7 @@ export default function Footer({ onNavigate }) {
               color: 'var(--text-heading)',
               fontFamily: 'var(--font-heading)'
             }}>
-              MultiScreen
+              Multy-sky
             </span>
           </div>
           <p style={{
@@ -258,7 +258,7 @@ export default function Footer({ onNavigate }) {
         fontSize: '0.88rem'
       }}>
         <div>
-          © {new Date().getFullYear()} MultiScreen Platform. Hand-crafted with tactile Claymorphism.
+          © {new Date().getFullYear()} Multy-sky.
         </div>
         <div style={{ display: 'flex', gap: '18px' }}>
           <span>Privacy Friendly</span>

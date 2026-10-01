@@ -58,7 +58,7 @@ export default function AdminLogin() {
 
         <div className="admin-login-header">
           <div className="admin-security-pill">
-            <Shield size={14} /> MultiScreen Management CMS
+            <Shield size={14} /> Multy-sky CMS
           </div>
           <h1 className="admin-login-heading">Administrator Portal</h1>
           <p className="admin-login-subtext">
@@ -98,7 +98,7 @@ export default function AdminLogin() {
         </form>
 
         <div className="admin-login-footer-info">
-          <span>Protected by MultiScreen Server Authentication</span>
+          <span>Protected by Server Authentication</span>
         </div>
       </div>
     </div>

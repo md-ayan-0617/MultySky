@@ -13,8 +13,6 @@ import PlaybackControls from '../components/PlaybackControls';
 import BezelSettings from '../components/BezelSettings';
 import MultiScreenSimulator from '../components/MultiScreenSimulator';
 import SessionControlPanel from '../components/SessionControlPanel';
-import AnimationModeSelector from '../components/AnimationModeSelector';
-import CustomMessageInput from '../components/CustomMessageInput';
 import CyberWaveControls from '../components/CyberWaveControls';
 import CakePartyControls from '../components/CakePartyControls';
 
@@ -387,10 +385,10 @@ export default function MasterDashboard({ sessionId: propSessionId, onNavigate: 
         </div>
       )}
 
-      {/* ── Main Dashboard Body ──────────────────────────────────────────── */}
-      <main style={{ maxWidth: '1440px', margin: '20px auto', padding: '0 16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* ── Main Dashboard Body: Connected Devices / Live Grid Wall prioritized at top ── */}
+      <main style={{ maxWidth: '1440px', margin: '10px auto', padding: '0 14px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         
-        {/* SECTION 1: Connected Devices / Live Grid Wall (Moved Upward) */}
+        {/* Connected Devices / Live Grid Wall (Positioned directly under session console) */}
         <MultiScreenSimulator
           layout={currentLayout}
           devices={devices}
@@ -409,21 +407,8 @@ export default function MasterDashboard({ sessionId: propSessionId, onNavigate: 
           }}
         />
 
-        {/* SECTION 2: 5 Animation Modes Selector */}
-        <AnimationModeSelector
-          activeMode={activeMode}
-          onSelectMode={handleSelectMode}
-        />
-
-        {/* SECTION 3: User-Controlled Animated Text Area */}
-        <CustomMessageInput
-          currentText={interactiveState?.customText || 'MULTISCREEN CYBER MATRIX'}
-          onUpdateText={handleUpdateCustomText}
-        />
-
-        {/* SECTION 4: Mode-Specific Controls */}
+        {/* Important Interactive Controls */}
         {activeMode === 'cake' ? (
-          /* Strictly conditional Cake Party controls */
           <CakePartyControls
             onTriggerInteractive={triggerInteractive}
             timerRemaining={timerRemaining}
@@ -433,7 +418,6 @@ export default function MasterDashboard({ sessionId: propSessionId, onNavigate: 
             onResetTimer={handleResetTimer}
           />
         ) : (
-          /* Default Cyber Wave Matrix Controls */
           <CyberWaveControls
             interactiveState={interactiveState}
             onTriggerInteractive={triggerInteractive}
