@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Smartphone, ArrowLeft, ArrowRight, QrCode, Link as LinkIcon, Camera, KeyRound, Sparkles, Check, Upload, AlertCircle } from 'lucide-react';
+import { Smartphone, ArrowLeft, ArrowRight, QrCode, Link as LinkIcon, Camera, KeyRound, Sparkles, Check, Upload, AlertCircle, Lock } from 'lucide-react';
 import { joinSession } from '../services/api';
 
 export default function JoinSession({ onNavigate, initialCode = '', onJoined }) {
@@ -7,6 +7,8 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
   const [activeTab, setActiveTab] = useState('scan');
   const [sessionCode, setSessionCode] = useState(initialCode);
   const [joiningLink, setJoiningLink] = useState('');
+  const [pin, setPin] = useState('');
+  const [needPin, setNeedPin] = useState(false);
   const [deviceName, setDeviceName] = useState(() => {
     const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (typeof navigator !== 'undefined' && /iPhone/i.test(navigator.userAgent)) return 'iPhone Display';
@@ -42,7 +44,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
     return clean;
   };
 
-  // Perform join action with a given code
+  // Perform join action with a given code (Auto Reconnect & Re-use Device ID - Requirement 13)
   const executeJoin = async (targetCode) => {
     const finalCode = extractCode(targetCode);
     if (!finalCode) {
@@ -53,18 +55,30 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
     setIsJoining(true);
     setError(null);
 
-    const deviceId = `dev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    // Preserve deviceId across reloads / network drops to prevent duplicate devices
+    let deviceId;
+    try {
+      deviceId = sessionStorage.getItem('ms-device-id');
+      if (!deviceId) {
+        deviceId = `dev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+        sessionStorage.setItem('ms-device-id', deviceId);
+      }
+      sessionStorage.setItem('ms-session-id', finalCode);
+      sessionStorage.setItem('ms-device-name', deviceName.trim());
+    } catch {
+      deviceId = `dev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    }
 
     try {
       const res = await joinSession({
         sessionId: finalCode,
         deviceId,
         deviceName: deviceName.trim(),
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
+        pin: pin ? pin.trim() : undefined
       });
 
       if (res?.success) {
-        // Stop camera stream if active
         stopCamera();
         if (onJoined) {
           onJoined(res.session, res.device);
@@ -76,7 +90,12 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
           });
         }
       } else {
-        setError(res?.message || 'Failed to join session. Please check the code.');
+        if (res?.error === 'INVALID_PIN') {
+          setNeedPin(true);
+          setError('Session requires a PIN code. Please enter the PIN provided by the host.');
+        } else {
+          setError(res?.message || 'Failed to join session. Please check the code.');
+        }
       }
     } catch (err) {
       console.error(err);
@@ -177,35 +196,12 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
         setError('Error reading QR image.');
       }
     } else {
-      setError('Barcode detector is not supported in this browser. Please use manual code.');
+      setError('Barcode detector is not supported in this browser. Please enter the session code manually.');
     }
   };
 
-  // Tab button styling helper
-  const tabStyle = (tabKey, accentColor) => {
-    const isActive = activeTab === tabKey;
-    return {
-      background: isActive ? 'var(--nm-surface-dark)' : 'var(--nm-surface)',
-      border: isActive
-        ? `1px solid ${accentColor}`
-        : 'var(--border-card)',
-      borderRadius: '10px',
-      padding: '10px 6px',
-      color: isActive ? accentColor : 'var(--text-muted)',
-      fontSize: '0.78rem',
-      fontWeight: 600,
-      cursor: 'pointer',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '4px',
-      transition: 'all 0.2s',
-      boxShadow: isActive ? 'var(--nm-pressed)' : 'var(--nm-raised-sm)'
-    };
-  };
-
   return (
-    <div style={{ maxWidth: '540px', margin: '30px auto', padding: '0 20px' }}>
+    <div style={{ maxWidth: '520px', margin: '30px auto', padding: '0 20px' }}>
       <button
         onClick={() => {
           stopCamera();
@@ -224,40 +220,36 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'var(--nm-surface-dark)',
-            boxShadow: 'var(--nm-inset-sm)',
-            border: '1px solid rgba(6, 182, 212, 0.3)',
+            background: 'var(--nm-surface-light)',
+            border: 'var(--border-subtle)',
             padding: '6px 16px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.85rem',
             color: 'var(--accent-cyan)',
             marginBottom: '10px'
           }}>
-            <Smartphone size={16} /> Connect Display Phone
+            <Smartphone size={16} /> Pair Phone Screen
           </div>
           <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-heading)', marginBottom: '6px' }}>
             Join Multi-Phone Wall
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Choose how you want to connect your phone to the session
+            Connect your smartphone into the synchronized visual wall
           </p>
         </div>
 
         {/* Error message */}
         {error && (
           <div style={{
-            background: 'var(--nm-surface-dark)',
-            boxShadow: 'var(--nm-inset-sm)',
-            border: '1px solid var(--btn-danger-border)',
+            background: 'rgba(244, 63, 94, 0.1)',
+            border: '1px solid rgba(244, 63, 94, 0.3)',
             color: 'var(--accent-rose)',
-            padding: '12px',
-            borderRadius: '10px',
+            padding: '12px 14px',
+            borderRadius: 'var(--radius-md)',
             marginBottom: '20px',
             fontSize: '0.88rem',
-            textAlign: 'center',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
             gap: '8px'
           }}>
             <AlertCircle size={16} />
@@ -265,27 +257,39 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
           </div>
         )}
 
-        {/* Device Nickname (Shared across all tabs) */}
-        <div style={{ marginBottom: '20px' }}>
+        {/* Device Nickname Input */}
+        <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
             Device Nickname
           </label>
           <input
             type="text"
-            placeholder="e.g. My Phone"
+            placeholder="e.g. My iPhone / Screen 12"
             value={deviceName}
             onChange={(e) => setDeviceName(e.target.value)}
-            style={{
-              width: '100%',
-              borderRadius: '10px',
-              padding: '10px 14px',
-              fontSize: '0.95rem',
-              outline: 'none'
-            }}
+            className="input-control"
           />
         </div>
 
-        {/* ── TAB 1: SCAN QR CODE (PRD 5.2 Mockup) ────────────────── */}
+        {/* Optional PIN Code (Requirement 14) */}
+        {(needPin || activeTab === 'code') && (
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
+              <Lock size={14} color="var(--accent-amber)" /> Session PIN {needPin ? '(Required)' : '(If Protected)'}
+            </label>
+            <input
+              type="text"
+              maxLength="6"
+              placeholder="e.g. 1234"
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              className="input-control"
+              style={{ letterSpacing: '2px', fontFamily: 'var(--font-mono)' }}
+            />
+          </div>
+        )}
+
+        {/* ── TAB 1: SCAN QR CODE ──────────────────────────────────── */}
         {activeTab === 'scan' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{
@@ -293,15 +297,15 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
               maxWidth: '320px',
               height: '240px',
               background: 'var(--nm-surface-dark)',
-              boxShadow: 'var(--nm-inset)',
-              borderRadius: '18px',
+              borderRadius: 'var(--radius-lg)',
               position: 'relative',
               overflow: 'hidden',
               border: '2px solid var(--accent-cyan)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '16px'
+              marginBottom: '16px',
+              boxShadow: 'var(--shadow-md)'
             }}>
               {cameraActive ? (
                 <video
@@ -324,7 +328,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 </div>
               )}
 
-              {/* Viewfinder Reticle Overlay (Matching PRD mockup) */}
+              {/* Viewfinder Reticle Overlay */}
               <div style={{
                 position: 'absolute',
                 width: '180px',
@@ -337,14 +341,12 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                {/* Scanning laser line animation */}
                 <div style={{
                   position: 'absolute',
                   width: '100%',
                   height: '2px',
                   background: 'var(--accent-cyan)',
-                  boxShadow: '0 0 8px var(--accent-cyan)',
-                  animation: 'scanLine 2s linear infinite'
+                  boxShadow: '0 0 8px var(--accent-cyan)'
                 }} />
               </div>
             </div>
@@ -352,16 +354,10 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
             <p style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', marginBottom: '18px', textAlign: 'center' }}>
               {scanMessage}
             </p>
-
-            <div style={{ width: '100%', borderTop: 'var(--border-card)', paddingTop: '16px', textAlign: 'center' }}>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
-                Don't have camera access? Switch to <strong>Enter Session ID</strong> or <strong>Join with Link</strong> below.
-              </span>
-            </div>
           </div>
         )}
 
-        {/* ── TAB 2: JOIN WITH LINK (PRD 5.2 Mockup) ───────────────── */}
+        {/* ── TAB 2: JOIN WITH LINK ────────────────────────────────── */}
         {activeTab === 'link' && (
           <form
             onSubmit={(e) => {
@@ -376,17 +372,11 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
               </label>
               <input
                 type="text"
-                placeholder="e.g. https://multysky.onrender.com/?session=MS-7K9X48"
+                placeholder="e.g. https://multy-sky.vercel.app/?join=MS-7K9X48"
                 value={joiningLink}
                 onChange={(e) => setJoiningLink(e.target.value)}
                 required
-                style={{
-                  width: '100%',
-                  borderRadius: '12px',
-                  padding: '12px 14px',
-                  fontSize: '0.95rem',
-                  outline: 'none'
-                }}
+                className="input-control"
               />
             </div>
 
@@ -394,14 +384,14 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
               type="submit"
               disabled={isJoining}
               className="btn-primary"
-              style={{ padding: '14px', fontSize: '1rem', marginTop: '6px' }}
+              style={{ padding: '12px', fontSize: '0.95rem' }}
             >
               {isJoining ? 'Joining...' : <>Join Session with Link <ArrowRight size={16} /></>}
             </button>
           </form>
         )}
 
-        {/* ── TAB 3: ENTER SESSION ID (PRD 5.2 Mockup) ─────────────── */}
+        {/* ── TAB 3: ENTER SESSION ID ──────────────────────────────── */}
         {activeTab === 'code' && (
           <form
             onSubmit={(e) => {
@@ -420,16 +410,13 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 value={sessionCode}
                 onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
                 required
+                className="input-control"
                 style={{
-                  width: '100%',
-                  borderRadius: '12px',
-                  padding: '14px 16px',
-                  fontSize: '1.25rem',
-                  fontFamily: 'monospace',
+                  fontSize: '1.3rem',
+                  fontFamily: 'var(--font-mono)',
                   fontWeight: 700,
                   letterSpacing: '2px',
-                  textAlign: 'center',
-                  outline: 'none'
+                  textAlign: 'center'
                 }}
               />
             </div>
@@ -438,47 +425,50 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
               type="submit"
               disabled={isJoining}
               className="btn-primary"
-              style={{ padding: '14px', fontSize: '1rem', marginTop: '6px' }}
+              style={{ padding: '12px', fontSize: '0.95rem' }}
             >
               {isJoining ? 'Connecting to Wall...' : <>Join Session <ArrowRight size={16} /></>}
             </button>
           </form>
         )}
 
-        {/* ── 3 Bottom Switching Tabs (Matching PRD 5.2 Mockup) ─────── */}
+        {/* ── 3 Bottom Switching Tabs ──────────────────────────────── */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '8px',
-          marginTop: '28px',
-          paddingTop: '20px',
-          borderTop: 'var(--border-card)'
+          marginTop: '24px',
+          paddingTop: '16px',
+          borderTop: 'var(--border-subtle)'
         }}>
           <button
             type="button"
             onClick={() => setActiveTab('scan')}
-            style={tabStyle('scan', 'var(--accent-cyan)')}
+            className={activeTab === 'scan' ? 'btn-primary' : 'btn-secondary'}
+            style={{ padding: '8px 4px', fontSize: '0.78rem', flexDirection: 'column', gap: '4px' }}
           >
-            <QrCode size={16} />
-            <span>Scan QR Code</span>
+            <QrCode size={15} />
+            <span>Scan QR</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('link')}
-            style={tabStyle('link', 'var(--accent-primary)')}
+            className={activeTab === 'link' ? 'btn-primary' : 'btn-secondary'}
+            style={{ padding: '8px 4px', fontSize: '0.78rem', flexDirection: 'column', gap: '4px' }}
           >
-            <LinkIcon size={16} />
-            <span>Join with Link</span>
+            <LinkIcon size={15} />
+            <span>Join Link</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('code')}
-            style={tabStyle('code', 'var(--accent-secondary)')}
+            className={activeTab === 'code' ? 'btn-primary' : 'btn-secondary'}
+            style={{ padding: '8px 4px', fontSize: '0.78rem', flexDirection: 'column', gap: '4px' }}
           >
-            <KeyRound size={16} />
-            <span>Enter Session ID</span>
+            <KeyRound size={15} />
+            <span>Enter ID</span>
           </button>
         </div>
       </div>

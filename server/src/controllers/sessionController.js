@@ -2,8 +2,8 @@ import * as sessionService from '../services/sessionService.js';
 
 export const createSession = (req, res) => {
   try {
-    const { masterDeviceId, layoutId, initialMedia } = req.body || {};
-    const session = sessionService.createSession({ masterDeviceId, layoutId, initialMedia });
+    const { masterDeviceId, layoutId, initialMedia, pin, requireApproval } = req.body || {};
+    const session = sessionService.createSession({ masterDeviceId, layoutId, initialMedia, pin, requireApproval });
     return res.status(201).json({ success: true, session });
   } catch (error) {
     console.error('Error creating session:', error);
@@ -13,7 +13,7 @@ export const createSession = (req, res) => {
 
 export const joinSession = (req, res) => {
   try {
-    const { sessionId, deviceId, deviceName, userAgent } = req.body || {};
+    const { sessionId, deviceId, deviceName, userAgent, pin } = req.body || {};
     if (!sessionId) {
       return res.status(400).json({ success: false, message: 'Session ID is required' });
     }
@@ -27,13 +27,18 @@ export const joinSession = (req, res) => {
       return res.status(410).json({ success: false, message: 'This session has ended' });
     }
 
-    const { device } = sessionService.registerOrUpdateDevice(sessionId, {
+    const result = sessionService.registerOrUpdateDevice(sessionId, {
       deviceId,
       deviceName,
-      userAgent
+      userAgent,
+      pin
     });
 
-    return res.json({ success: true, session, device });
+    if (result?.error) {
+      return res.status(403).json({ success: false, error: result.error, message: result.message });
+    }
+
+    return res.json({ success: true, session, device: result.device });
   } catch (error) {
     console.error('Error joining session:', error);
     return res.status(500).json({ success: false, message: error.message });
@@ -57,8 +62,8 @@ export const getSessionById = (req, res) => {
 export const updateLayout = (req, res) => {
   try {
     const { id } = req.params;
-    const { layoutId } = req.body;
-    const session = sessionService.updateSessionLayout(id, layoutId);
+    const { layoutId, layout } = req.body;
+    const session = sessionService.updateSessionLayout(id, layout || layoutId);
     if (!session) {
       return res.status(404).json({ success: false, message: 'Session not found' });
     }

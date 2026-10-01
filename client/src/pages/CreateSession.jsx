@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { Layers, ArrowLeft, ArrowRight, Sparkles, Check } from 'lucide-react';
+import { Layers, ArrowLeft, ArrowRight, Sparkles, Check, Lock, ShieldCheck, Grid } from 'lucide-react';
 import { createSession } from '../services/api';
-
-const LAYOUTS = [
-  { id: '1x2', name: '1 × 2', rows: 1, cols: 2, desc: '2 Phones Side-by-Side' },
-  { id: '2x2', name: '2 × 2', rows: 2, cols: 2, desc: '4 Phones Quad Wall (Recommended)' },
-  { id: '2x3', name: '2 × 3', rows: 2, cols: 3, desc: '6 Phones Wide Display' },
-  { id: '3x3', name: '3 × 3', rows: 3, cols: 3, desc: '9 Phones Mega Screen' },
-  { id: '1x1', name: '1 × 1', rows: 1, cols: 1, desc: '1 Phone Test Mode' }
-];
+import LayoutSelector from '../components/LayoutSelector';
+import { calculateOptimalGrid } from '../utils/layoutUtils';
 
 export default function CreateSession({ onNavigate, onCreated }) {
-  const [selectedLayout, setSelectedLayout] = useState('2x2');
+  const [selectedLayout, setSelectedLayout] = useState({ id: '2x2', rows: 2, cols: 2, total: 4 });
+  const [pin, setPin] = useState('');
+  const [enablePin, setEnablePin] = useState(false);
+  const [requireApproval, setRequireApproval] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState(null);
 
@@ -20,7 +17,9 @@ export default function CreateSession({ onNavigate, onCreated }) {
     setError(null);
     try {
       const res = await createSession({
-        layoutId: selectedLayout
+        layoutId: selectedLayout.id || `${selectedLayout.rows}x${selectedLayout.cols}`,
+        pin: enablePin && pin ? pin.trim() : null,
+        requireApproval
       });
 
       if (res?.success && res.session) {
@@ -34,14 +33,14 @@ export default function CreateSession({ onNavigate, onCreated }) {
       }
     } catch (err) {
       console.error(err);
-      setError('Connection error creating session');
+      setError('Connection error creating session. Please ensure backend is accessible.');
     } finally {
       setIsCreating(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', padding: '0 20px' }}>
+    <div style={{ maxWidth: '840px', margin: '40px auto', padding: '0 20px' }}>
       <button
         onClick={() => onNavigate('home')}
         className="btn-secondary"
@@ -56,115 +55,131 @@ export default function CreateSession({ onNavigate, onCreated }) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'var(--nm-surface-dark)',
-            boxShadow: 'var(--nm-inset-sm)',
-            border: '1px solid var(--btn-primary-border)',
+            background: 'var(--nm-surface-light)',
+            border: 'var(--border-subtle)',
             padding: '6px 16px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.85rem',
             color: 'var(--accent-primary)',
             marginBottom: '12px'
           }}>
-            <Sparkles size={16} /> Step 1: Session Setup
+            <Sparkles size={16} /> Session Setup & Grid Configuration
           </div>
           <h2 style={{ fontSize: '2.2rem', color: 'var(--text-heading)', marginBottom: '8px' }}>
             Create MultiScreen Session
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            Choose your desired smartphone screen layout. You can also adjust this later in the dashboard.
+            Configure 1 to 100 smartphones in an intelligent multi-screen video wall.
           </p>
         </div>
 
         {error && (
           <div style={{
-            background: 'var(--nm-surface-dark)',
-            boxShadow: 'var(--nm-inset-sm)',
-            border: '1px solid var(--btn-danger-border)',
+            background: 'rgba(244, 63, 94, 0.1)',
+            border: '1px solid rgba(244, 63, 94, 0.3)',
             color: 'var(--accent-rose)',
-            padding: '12px',
-            borderRadius: '10px',
+            padding: '12px 16px',
+            borderRadius: 'var(--radius-md)',
             marginBottom: '20px',
-            textAlign: 'center'
+            fontSize: '0.9rem'
           }}>
             {error}
           </div>
         )}
 
-        {/* Layout Options */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          marginBottom: '36px'
-        }}>
-          {LAYOUTS.map(layout => {
-            const isSelected = selectedLayout === layout.id;
-            return (
-              <div
-                key={layout.id}
-                onClick={() => setSelectedLayout(layout.id)}
-                style={{
-                  background: isSelected ? 'var(--nm-surface-light)' : 'var(--nm-surface)',
-                  border: isSelected ? '2px solid var(--accent-primary)' : 'var(--border-card)',
-                  borderRadius: '16px',
-                  padding: '20px 16px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  transition: 'all 0.2s',
-                  boxShadow: isSelected
-                    ? '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 25px var(--btn-primary-glow)'
-                    : 'var(--nm-raised-sm)',
-                  transform: isSelected ? 'scale(1.03)' : 'none'
-                }}
-              >
-                {/* Visual Grid Representation */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-                  gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
-                  gap: '4px',
-                  width: '80px',
-                  height: '56px',
-                  background: 'var(--nm-surface-dark)',
-                  boxShadow: 'var(--nm-inset-sm)',
-                  padding: '6px',
-                  borderRadius: '8px',
-                  marginBottom: '14px'
-                }}>
-                  {Array.from({ length: layout.rows * layout.cols }).map((_, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        background: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)',
-                        borderRadius: '3px',
-                        opacity: isSelected ? 1 : 0.35
-                      }}
-                    />
-                  ))}
-                </div>
-
-                <div style={{ fontWeight: 800, fontSize: '1.2rem', color: isSelected ? 'var(--text-heading)' : 'var(--text-muted)' }}>
-                  {layout.name}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)', textAlign: 'center', marginTop: '4px' }}>
-                  {layout.desc}
-                </div>
-              </div>
-            );
-          })}
+        {/* Layout Selector (Standard + More Grids 10-100 + Custom) */}
+        <div style={{ marginBottom: '28px' }}>
+          <LayoutSelector
+            currentLayout={selectedLayout}
+            onSelectLayout={(layout) => setSelectedLayout(layout)}
+          />
         </div>
 
-        {/* Submit */}
-        <div style={{ textAlign: 'center' }}>
+        {/* Session Security Options (Requirement 14) */}
+        <div style={{
+          background: 'var(--nm-surface-light)',
+          border: 'var(--border-subtle)',
+          borderRadius: 'var(--radius-md)',
+          padding: '20px',
+          marginBottom: '28px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px'
+        }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-heading)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Session Security & Device Control
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+            {/* PIN Protection */}
+            <div style={{
+              background: 'var(--nm-surface)',
+              border: 'var(--border-subtle)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '14px'
+            }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: enablePin ? '10px' : '0' }}>
+                <input
+                  type="checkbox"
+                  checked={enablePin}
+                  onChange={e => setEnablePin(e.target.checked)}
+                  style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)' }}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-heading)' }}>
+                  <Lock size={15} color="var(--accent-amber)" /> Optional Join PIN
+                </div>
+              </label>
+
+              {enablePin && (
+                <input
+                  type="text"
+                  maxLength="6"
+                  placeholder="e.g. 1234"
+                  value={pin}
+                  onChange={e => setPin(e.target.value)}
+                  className="input-control"
+                  style={{ marginTop: '6px', fontSize: '0.9rem' }}
+                />
+              )}
+            </div>
+
+            {/* Device Approval Queue */}
+            <div style={{
+              background: 'var(--nm-surface)',
+              border: 'var(--border-subtle)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '14px'
+            }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={requireApproval}
+                  onChange={e => setRequireApproval(e.target.checked)}
+                  style={{ width: '16px', height: '16px', accentColor: 'var(--accent-primary)' }}
+                />
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-heading)' }}>
+                    <ShieldCheck size={16} color="var(--accent-emerald)" /> Host Device Approval
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Require Master approval before display devices appear on wall
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <button
             onClick={handleCreate}
             disabled={isCreating}
             className="btn-primary"
-            style={{ padding: '16px 48px', fontSize: '1.1rem' }}
+            style={{ padding: '14px 28px', fontSize: '1rem' }}
           >
-            {isCreating ? 'Creating Session...' : <>Launch Master Dashboard <ArrowRight size={20} /></>}
+            {isCreating ? 'Launching Session...' : `Launch Session (${selectedLayout.rows}×${selectedLayout.cols})`}
+            <ArrowRight size={18} />
           </button>
         </div>
       </div>

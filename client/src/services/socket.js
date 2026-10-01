@@ -49,7 +49,7 @@ export function getSocketUrl() {
     return origin;
   }
 
-  return 'http://localhost:3001';
+  return import.meta.env.DEV ? 'http://localhost:3001' : PROD_BACKEND_URL;
 }
 
 export function getSocket() {

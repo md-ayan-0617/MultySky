@@ -172,18 +172,20 @@ export default function PositionGuideModal({
             {/* Visual Phone Wall Grid with Pulsing Highlight on Assigned Slot */}
             <div style={{
               background: 'rgba(0, 0, 0, 0.6)',
-              border: '2px solid rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '16px',
-              padding: '14px',
-              marginBottom: '20px',
+              padding: '12px',
+              marginBottom: '18px',
               display: 'inline-block',
+              maxWidth: '100%',
+              overflowX: 'auto',
               boxShadow: 'inset 0 0 20px rgba(0,0,0,0.6)'
             }}>
               <div style={{
                 display: 'grid',
-                gridTemplateRows: `repeat(${rows}, 65px)`,
-                gridTemplateColumns: `repeat(${cols}, 80px)`,
-                gap: '8px'
+                gridTemplateRows: `repeat(${rows}, ${rows * cols > 36 ? '26px' : (rows * cols > 12 ? '36px' : '52px')})`,
+                gridTemplateColumns: `repeat(${cols}, ${rows * cols > 36 ? '28px' : (rows * cols > 12 ? '42px' : '64px')})`,
+                gap: rows * cols > 36 ? '3px' : '6px'
               }}>
                 {Array.from({ length: rows * cols }).map((_, slotIdx) => {
                   const isMySlot = slotIdx === targetIndex;
@@ -195,32 +197,32 @@ export default function PositionGuideModal({
                           ? 'linear-gradient(135deg, #00e5ff 0%, #06b6d4 100%)'
                           : 'rgba(255, 255, 255, 0.05)',
                         border: isMySlot ? '2px solid #ffffff' : '1px dashed rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px',
+                        borderRadius: rows * cols > 36 ? '4px' : '8px',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
                         color: isMySlot ? '#000' : 'rgba(255, 255, 255, 0.4)',
-                        boxShadow: isMySlot ? '0 0 25px rgba(0, 229, 255, 0.85)' : 'none',
+                        boxShadow: isMySlot ? '0 0 20px rgba(0, 229, 255, 0.85)' : 'none',
                         transform: isMySlot ? 'scale(1.08)' : 'scale(1)',
-                        transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        transition: 'all 0.2s ease',
                         position: 'relative'
                       }}
                     >
-                      <Smartphone size={18} style={{ marginBottom: '2px' }} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>
+                      {rows * cols <= 36 && <Smartphone size={rows * cols > 12 ? 14 : 16} />}
+                      <span style={{ fontSize: rows * cols > 36 ? '0.62rem' : '0.72rem', fontWeight: 800 }}>
                         {slotIdx + 1}
                       </span>
                       {isMySlot && (
                         <span style={{
                           position: 'absolute',
-                          top: '-8px',
+                          top: rows * cols > 36 ? '-6px' : '-8px',
                           background: '#00e5ff',
                           color: '#000',
-                          fontSize: '0.62rem',
+                          fontSize: '0.55rem',
                           fontWeight: 900,
-                          padding: '1px 6px',
-                          borderRadius: '4px',
+                          padding: '1px 4px',
+                          borderRadius: '3px',
                           boxShadow: '0 2px 5px rgba(0,0,0,0.5)'
                         }}>
                           YOU

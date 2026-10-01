@@ -18,32 +18,32 @@ function FloatingThemeToggle({ theme, onToggle }) {
         top: '18px',
         right: '18px',
         zIndex: 9999,
-        width: '50px',
-        height: '50px',
+        width: '44px',
+        height: '44px',
         borderRadius: '50%',
-        border: 'none',
+        border: 'var(--border-card)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--icon-box-bg)',
-        boxShadow: '5px 5px 14px var(--nm-dark-shadow), -5px -5px 14px var(--nm-light-shadow), 0 0 12px var(--btn-primary-glow)',
-        transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-        fontSize: '1.35rem',
+        background: 'var(--nm-surface)',
+        boxShadow: 'var(--shadow-md)',
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        fontSize: '1.25rem',
         lineHeight: 1,
         userSelect: 'none',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.transform = 'scale(1.12) rotate(15deg)';
+        e.currentTarget.style.transform = 'scale(1.1) rotate(12deg)';
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
       }}
       onMouseDown={e => {
-        e.currentTarget.style.transform = 'scale(0.93)';
+        e.currentTarget.style.transform = 'scale(0.95)';
       }}
       onMouseUp={e => {
-        e.currentTarget.style.transform = 'scale(1.12) rotate(15deg)';
+        e.currentTarget.style.transform = 'scale(1.1) rotate(12deg)';
       }}
     >
       {theme === 'dark' ? '☀️' : '🌙'}

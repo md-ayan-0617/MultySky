@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   Neumorphic Component Styles — neumorphism.io approach
-   No borders, pure shadow-based depth
+   MultiScreen Application Component Styles
    ═══════════════════════════════════════════════════════════════════════ */
 
 .app-container {
@@ -9,61 +8,42 @@
   background-color: var(--nm-bg);
 }
 
-/* ── Neumorphic phone simulator frame ── */
+/* ── Scalable Phone Simulator Frame ── */
 .nm-phone-shell {
   background: var(--nm-surface);
-  box-shadow: var(--nm-raised);
-  border: none;
-  border-radius: 20px;
-  padding: 10px;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-card);
+  border-radius: var(--radius-sm);
   position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
 .nm-phone-shell:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--nm-raised-lg);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .nm-phone-shell.active-slot {
-  box-shadow: var(--nm-raised), var(--accent-glow-cyan);
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), var(--shadow-md) !important;
 }
 
-/* ── Neumorphic tactile circular button ── */
-.nm-btn-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--icon-box-bg);
-  box-shadow: var(--nm-raised-sm);
-  border: none;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.nm-phone-shell.identified-slot {
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.6), var(--shadow-lg) !important;
+  animation: pulseGlow 1s infinite alternate;
 }
 
-.nm-btn-circle:hover {
-  transform: scale(1.08);
-  box-shadow: var(--nm-raised);
-  color: var(--accent-cyan);
-}
-
-.nm-btn-circle:active {
-  box-shadow: var(--nm-pressed);
-  transform: scale(0.95);
-}
-
-/* ── Neumorphic selected item (accent glow ring) ── */
+/* ── Selected State ── */
 .nm-selected {
-  box-shadow: var(--nm-raised), var(--accent-glow-cyan) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) !important;
 }
 
-/* ── Neumorphic active tab (pressed in) ── */
+/* ── Active Tab ── */
 .nm-tab-active {
-  background: var(--nm-surface) !important;
-  box-shadow: var(--nm-pressed) !important;
-  color: var(--accent-primary) !important;
+  background: var(--btn-primary-bg) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
 }

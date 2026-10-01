@@ -90,6 +90,30 @@ export function useSession({ sessionId, deviceId, role = 'display', deviceName =
       setSession(prev => prev ? { ...prev, bezel } : prev);
     };
 
+    const handleBlackoutToggled = ({ blackout }) => {
+      setSession(prev => prev ? { ...prev, blackout } : prev);
+    };
+
+    const handleJoinExitMediaUpdated = ({ joinMedia, exitMedia }) => {
+      setSession(prev => prev ? { ...prev, joinMedia, exitMedia } : prev);
+    };
+
+    const handleTimerSync = ({ timer }) => {
+      setSession(prev => prev ? { ...prev, timer } : prev);
+    };
+
+    const handleDeviceApproved = ({ deviceId: approvedId }) => {
+      if (deviceId === approvedId) {
+        setDevice(prev => prev ? { ...prev, status: 'ready' } : prev);
+      }
+    };
+
+    const handleDeviceRejected = ({ deviceId: rejectedId }) => {
+      if (deviceId === rejectedId) {
+        setError('Device connection was rejected by host');
+      }
+    };
+
     const handleSessionEnded = () => {
       setSession(prev => prev ? { ...prev, status: 'ended' } : prev);
     };
@@ -99,6 +123,11 @@ export function useSession({ sessionId, deviceId, role = 'display', deviceName =
     socket.on('position-changed', handlePositionChanged);
     socket.on('media-changed', handleMediaChanged);
     socket.on('bezel-changed', handleBezelChanged);
+    socket.on('blackout-toggled', handleBlackoutToggled);
+    socket.on('join-exit-media-updated', handleJoinExitMediaUpdated);
+    socket.on('timer-sync', handleTimerSync);
+    socket.on('device-approved', handleDeviceApproved);
+    socket.on('device-rejected', handleDeviceRejected);
     socket.on('session-ended', handleSessionEnded);
 
     // Initial fetch fallback
@@ -126,6 +155,11 @@ export function useSession({ sessionId, deviceId, role = 'display', deviceName =
       socket.off('position-changed', handlePositionChanged);
       socket.off('media-changed', handleMediaChanged);
       socket.off('bezel-changed', handleBezelChanged);
+      socket.off('blackout-toggled', handleBlackoutToggled);
+      socket.off('join-exit-media-updated', handleJoinExitMediaUpdated);
+      socket.off('timer-sync', handleTimerSync);
+      socket.off('device-approved', handleDeviceApproved);
+      socket.off('device-rejected', handleDeviceRejected);
       socket.off('session-ended', handleSessionEnded);
       unsubLocal();
     };

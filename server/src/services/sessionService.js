@@ -1,4 +1,4 @@
-// sessionService.js - In-memory and robust session management
+// sessionService.js - In-memory and robust session management supporting up to 100 devices
 export const sessions = new Map();
 
 export const LAYOUTS = {
@@ -8,6 +8,47 @@ export const LAYOUTS = {
   '2x2': { id: '2x2', name: '2 × 2', rows: 2, cols: 2, total: 4, label: 'Quad Display (2x2)' },
   '2x3': { id: '2x3', name: '2 × 3', rows: 2, cols: 3, total: 6, label: 'Wide Grid (2x3)' },
   '3x3': { id: '3x3', name: '3 × 3', rows: 3, cols: 3, total: 9, label: 'Mega Wall (3x3)' }
+};
+
+/**
+ * Resolves layout from ID, preset name, or custom dimension object up to 100 phones.
+ */
+export const resolveLayout = (layoutInput) => {
+  if (!layoutInput) return LAYOUTS['2x2'];
+
+  if (typeof layoutInput === 'object') {
+    const rows = Math.max(1, Math.min(10, parseInt(layoutInput.rows, 10) || 2));
+    const cols = Math.max(1, Math.min(10, parseInt(layoutInput.cols, 10) || 2));
+    const total = Math.min(100, Math.max(1, rows * cols));
+    return {
+      id: `${rows}x${cols}`,
+      name: `${rows} × ${cols}`,
+      rows,
+      cols,
+      total,
+      label: `${rows}×${cols} Grid (${total} Screens)`
+    };
+  }
+
+  const str = String(layoutInput).trim();
+  if (LAYOUTS[str]) return LAYOUTS[str];
+
+  const match = str.match(/^(\d+)x(\d+)$/i);
+  if (match) {
+    const rows = Math.max(1, Math.min(10, parseInt(match[1], 10)));
+    const cols = Math.max(1, Math.min(10, parseInt(match[2], 10)));
+    const total = Math.min(100, Math.max(1, rows * cols));
+    return {
+      id: `${rows}x${cols}`,
+      name: `${rows} × ${cols}`,
+      rows,
+      cols,
+      total,
+      label: `${rows}×${cols} Grid (${total} Screens)`
+    };
+  }
+
+  return LAYOUTS['2x2'];
 };
 
 export const generateSessionCode = () => {
@@ -24,25 +65,27 @@ export const getPositionLabel = (row, col, rows, cols) => {
   if (rows === 1 && cols === 2) return col === 0 ? 'Left Screen' : 'Right Screen';
   if (rows === 2 && cols === 1) return row === 0 ? 'Top Screen' : 'Bottom Screen';
   
-  const vertical = row === 0 ? 'Top' : (row === rows - 1 ? 'Bottom' : 'Middle');
-  const horizontal = col === 0 ? 'Left' : (col === cols - 1 ? 'Right' : 'Center');
+  const vertical = row === 0 ? 'Top' : (row === rows - 1 ? 'Bottom' : `Row ${row + 1}`);
+  const horizontal = col === 0 ? 'Left' : (col === cols - 1 ? 'Right' : `Col ${col + 1}`);
   
-  if (cols === 2 && rows === 2) {
+  if (cols <= 3 && rows <= 3) {
     return `${vertical} ${horizontal}`;
   }
-  return `Row ${row + 1}, Col ${col + 1} (${vertical}-${horizontal})`;
+  return `R${row + 1}:C${col + 1} (${vertical}-${horizontal})`;
 };
 
-export const createSession = ({ masterDeviceId = null, layoutId = '2x2', initialMedia = null } = {}) => {
+export const createSession = ({ masterDeviceId = null, layoutId = '2x2', initialMedia = null, pin = null, requireApproval = false } = {}) => {
   const sessionId = generateSessionCode();
-  const layout = LAYOUTS[layoutId] || LAYOUTS['2x2'];
+  const layout = resolveLayout(layoutId);
 
   const session = {
     id: sessionId,
     sessionCode: sessionId,
     masterDeviceId: masterDeviceId || `master-${Date.now()}`,
+    pin: pin ? String(pin).trim() : null,
+    requireApproval: !!requireApproval,
     layout,
-    devices: [], // list of connected display devices
+    devices: [], // list of connected display devices (up to 100)
     media: initialMedia || {
       id: 'exp-cake-1',
       name: 'Virtual Birthday Cake Party',
@@ -50,6 +93,28 @@ export const createSession = ({ masterDeviceId = null, layoutId = '2x2', initial
       category: 'Interactive',
       subType: 'cake',
       thumbnail: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80'
+    },
+    joinMedia: {
+      id: 'join-default',
+      name: 'Welcome Flash Pulse',
+      type: 'image',
+      url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80',
+      thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=300&auto=format&fit=crop&q=80'
+    },
+    exitMedia: {
+      id: 'exit-default',
+      name: 'Farewell Starlight Pulse',
+      type: 'image',
+      url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80',
+      thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&auto=format&fit=crop&q=80'
+    },
+    blackout: false,
+    timer: {
+      isRunning: false,
+      duration: 10,
+      startTimestamp: null,
+      targetTimestamp: null,
+      remaining: 10
     },
     playback: {
       isPlaying: false,
@@ -90,11 +155,11 @@ export const getSession = (sessionId) => {
   return sessions.get(cleanId) || null;
 };
 
-export const updateSessionLayout = (sessionId, layoutId) => {
+export const updateSessionLayout = (sessionId, layoutInput) => {
   const session = getSession(sessionId);
   if (!session) return null;
 
-  const layout = LAYOUTS[layoutId] || LAYOUTS['2x2'];
+  const layout = resolveLayout(layoutInput);
   session.layout = layout;
 
   // Re-assign or clamp device positions to new layout slots
@@ -113,15 +178,24 @@ export const updateSessionLayout = (sessionId, layoutId) => {
   return session;
 };
 
-export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socketId, role = 'display', userAgent = '' }) => {
+export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socketId, role = 'display', userAgent = '', pin = '' }) => {
   const session = getSession(sessionId);
   if (!session) return null;
+
+  // PIN verification if session is protected
+  if (session.pin && role === 'display') {
+    if (String(pin).trim() !== String(session.pin).trim()) {
+      return { error: 'INVALID_PIN', message: 'Incorrect session PIN code' };
+    }
+  }
 
   let existing = session.devices.find(d => d.id === deviceId);
 
   if (existing) {
     existing.socketId = socketId || existing.socketId;
-    existing.status = 'ready';
+    if (existing.status === 'disconnected') {
+      existing.status = session.requireApproval && existing.status !== 'approved' ? 'pending' : 'ready';
+    }
     existing.lastSeen = Date.now();
     return { device: existing, session };
   }
@@ -142,10 +216,12 @@ export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socket
   const row = Math.floor(assignedSlot / session.layout.cols);
   const col = assignedSlot % session.layout.cols;
 
+  const initialStatus = (session.requireApproval && role === 'display') ? 'pending' : 'ready';
+
   const newDevice = {
     id: deviceId || `dev-${Math.random().toString(36).substring(2, 8)}`,
-    deviceCode: `Device-${String(session.devices.length + 1).padStart(3, '0')}`,
-    name: deviceName || `Screen ${session.devices.length + 1}`,
+    deviceCode: `P${String(session.devices.length + 1).padStart(2, '0')}`,
+    name: deviceName || `Phone ${session.devices.length + 1}`,
     role,
     socketId,
     userAgent,
@@ -155,13 +231,37 @@ export const registerOrUpdateDevice = (sessionId, { deviceId, deviceName, socket
       col,
       label: getPositionLabel(row, col, session.layout.rows, session.layout.cols)
     },
-    status: 'ready',
+    status: initialStatus,
     joinedAt: new Date().toISOString(),
     lastSeen: Date.now()
   };
 
   session.devices.push(newDevice);
   return { device: newDevice, session };
+};
+
+export const approveDevice = (sessionId, deviceId) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+
+  const dev = session.devices.find(d => d.id === deviceId);
+  if (!dev) return null;
+
+  dev.status = 'ready';
+  dev.lastSeen = Date.now();
+  return { session, device: dev };
+};
+
+export const rejectDevice = (sessionId, deviceId) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+
+  const idx = session.devices.findIndex(d => d.id === deviceId);
+  if (idx !== -1) {
+    const [removed] = session.devices.splice(idx, 1);
+    return { session, removed };
+  }
+  return null;
 };
 
 export const removeDevice = (sessionId, deviceId) => {
@@ -194,6 +294,52 @@ export const updateDevicePosition = (sessionId, deviceId, newIndex) => {
     label: getPositionLabel(row, col, session.layout.rows, session.layout.cols)
   };
 
+  return session;
+};
+
+export const updateJoinExitMedia = (sessionId, { joinMedia, exitMedia }) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+
+  if (joinMedia !== undefined) session.joinMedia = joinMedia;
+  if (exitMedia !== undefined) session.exitMedia = exitMedia;
+
+  return session;
+};
+
+export const updateTimer = (sessionId, { action, duration = 10 }) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+
+  const now = Date.now();
+  if (action === 'START') {
+    const targetTimestamp = now + (duration * 1000);
+    session.timer = {
+      isRunning: true,
+      duration,
+      startTimestamp: now,
+      targetTimestamp,
+      remaining: duration
+    };
+  } else if (action === 'PAUSE') {
+    session.timer.isRunning = false;
+  } else if (action === 'RESET') {
+    session.timer = {
+      isRunning: false,
+      duration,
+      startTimestamp: null,
+      targetTimestamp: null,
+      remaining: duration
+    };
+  }
+
+  return session;
+};
+
+export const setBlackout = (sessionId, blackout) => {
+  const session = getSession(sessionId);
+  if (!session) return null;
+  session.blackout = !!blackout;
   return session;
 };
 

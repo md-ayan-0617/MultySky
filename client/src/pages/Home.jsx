@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Smartphone, Layers, Play, Sparkles, QrCode, ArrowRight, ShieldCheck, Zap, Users } from 'lucide-react';
+import { Smartphone, Layers, Play, Sparkles, QrCode, ArrowRight, ShieldCheck, Zap, Users, Monitor } from 'lucide-react';
 
 export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }) {
   const [manualCode, setManualCode] = useState('');
@@ -12,188 +12,201 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
   };
 
   return (
-    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '36px 20px 80px' }}>
+    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '40px 20px 80px' }}>
       {/* Hero Section */}
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-        {/* Neumorphic pill badge */}
+        {/* Pill Badge */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '8px',
           background: 'var(--nm-surface)',
-          boxShadow: 'var(--nm-raised-sm)',
-          padding: '10px 24px',
+          border: 'var(--border-subtle)',
+          padding: '8px 20px',
           borderRadius: 'var(--radius-full)',
           fontSize: '0.85rem',
-          color: 'var(--accent-cyan)',
-          marginBottom: '28px',
+          color: 'var(--accent-primary)',
+          marginBottom: '24px',
           fontWeight: 600,
-          letterSpacing: '0.02em'
+          boxShadow: 'var(--shadow-sm)'
         }}>
-          <Sparkles size={16} /> Web-Based Multi-Device Display Platform
+          <Sparkles size={16} /> Web-Based Multi-Device Display Platform (Supports 1–100 Phones)
         </div>
 
         <h1 style={{
-          fontSize: 'clamp(2.5rem, 6.5vw, 4.4rem)',
+          fontSize: 'clamp(2.5rem, 6vw, 4.2rem)',
           fontWeight: 900,
           lineHeight: 1.15,
-          marginBottom: '22px',
+          marginBottom: '20px',
           color: 'var(--text-heading)'
         }}>
           Combine Multiple Phones into <br />
-          <span className="gradient-text">One Giant Virtual Display</span>
+          <span style={{
+            background: 'var(--gradient-text)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            One Giant Virtual Display Wall
+          </span>
         </h1>
 
         <p style={{
-          fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+          fontSize: 'clamp(1rem, 2vw, 1.2rem)',
           color: 'var(--text-muted)',
-          maxWidth: '700px',
-          margin: '0 auto 44px',
-          lineHeight: 1.65
+          maxWidth: '720px',
+          margin: '0 auto 40px',
+          lineHeight: 1.6
         }}>
-          Place smartphones side-by-side, pair via QR code, and watch synchronized 4K videos, 
-          panoramic photos, and live interactive party games span seamlessly across all screens.
+          Assemble 2 to 100 smartphones side-by-side, pair instantly via QR code, and watch synchronized media,
+          superhero art, panoramic photo walls, and live interactive games span seamlessly across every screen.
         </p>
 
-        {/* Neumorphic Primary Action Buttons */}
-        <div style={{ display: 'flex', gap: '18px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '48px' }}>
+        {/* Primary Action Buttons */}
+        <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '40px' }}>
           <button
             onClick={() => onNavigate('create')}
             className="btn-primary"
-            style={{ padding: '16px 34px', fontSize: '1.08rem' }}
+            style={{ padding: '14px 28px', fontSize: '1rem' }}
           >
-            <Smartphone size={22} color="var(--accent-cyan)" /> Create Master Session
+            <Smartphone size={20} /> Create Master Session
           </button>
 
           <button
             onClick={() => onNavigate('join')}
             className="btn-secondary"
-            style={{ padding: '16px 30px', fontSize: '1.08rem' }}
+            style={{ padding: '14px 26px', fontSize: '1rem' }}
           >
-            <QrCode size={22} color="var(--accent-primary)" /> Join as Display Phone
+            <QrCode size={20} color="var(--accent-primary)" /> Join as Display Phone
           </button>
 
           <button
             onClick={onQuickStartCake}
             className="btn-secondary"
-            style={{
-              padding: '16px 28px',
-              fontSize: '1.08rem',
-              boxShadow: 'var(--nm-raised), var(--accent-glow-pink)'
-            }}
+            style={{ padding: '14px 24px', fontSize: '1rem' }}
           >
-            🎂 Demo: Virtual Cake Party
+            🎂 Demo: Cake Cutting
           </button>
 
           <button
             onClick={onQuickStartCyber}
             className="btn-secondary"
-            style={{
-              padding: '16px 28px',
-              fontSize: '1.08rem',
-              boxShadow: 'var(--nm-raised), var(--accent-glow-cyan)'
-            }}
+            style={{ padding: '14px 24px', fontSize: '1rem' }}
           >
-            ⚡ Demo: Cyber Wave Matrix
+            ⚡ Demo: Cyber Wave
           </button>
         </div>
 
-        {/* Neumorphic Sunken Well Join Form */}
+        {/* Quick Join Code Form */}
         <form
           onSubmit={handleJoinSubmit}
-          className="nm-well"
           style={{
-            maxWidth: '460px',
+            maxWidth: '440px',
             margin: '0 auto',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-xl)'
+            gap: '8px',
+            background: 'var(--nm-surface)',
+            border: 'var(--border-card)',
+            padding: '6px 8px',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow-sm)'
           }}
         >
           <input
             type="text"
-            placeholder="Enter Session Code (e.g. MS-7F42A9)"
+            placeholder="Enter Session Code (e.g. MS-ABC123)"
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
             style={{
               flex: 1,
-              background: 'transparent !important',
-              boxShadow: 'none !important',
-              border: 'none !important',
+              background: 'transparent',
+              border: 'none',
               color: 'var(--text-main)',
-              padding: '10px 14px',
-              fontSize: '1rem',
+              padding: '8px 12px',
+              fontSize: '0.95rem',
               outline: 'none',
-              fontFamily: 'monospace',
-              letterSpacing: '1px'
+              fontFamily: 'var(--font-mono)'
             }}
           />
           <button
             type="submit"
             className="btn-primary"
-            style={{ padding: '10px 20px', borderRadius: 'var(--radius-md)' }}
+            style={{ padding: '8px 18px', fontSize: '0.85rem' }}
           >
-            Join <ArrowRight size={16} />
+            Join <ArrowRight size={15} />
           </button>
         </form>
       </div>
 
-      {/* Feature Showcase Grid — Neumorphic raised cards */}
+      {/* Feature Showcase Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
-        gap: '28px',
-        marginBottom: '64px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: '20px',
+        marginBottom: '48px'
       }}>
         {[
-          { icon: <QrCode size={24} />, color: 'var(--accent-cyan)', title: 'Instant QR Code Pairing',
-            desc: 'Zero apps or setup required. Friends simply point their smartphone camera at the master screen to join the synchronized wall in seconds.' },
-          { icon: <Layers size={24} />, color: 'var(--accent-primary)', title: 'Automatic Region Splitting',
-            desc: 'Hardware-accelerated HTML5 Canvas cropping engine divides high-res media dynamically for 1×2, 2×2, 2×3, or 3×3 grids with bezel compensation.' },
-          { icon: <Sparkles size={24} />, color: 'var(--accent-pink)', title: 'Interactive Cake Experience',
-            desc: 'Assemble phones for celebrations. Swipe a virtual knife across multiple phone screens to slice the cake with realistic physics, candle blowing, and confetti!' },
-          { icon: <Zap size={24} />, color: 'var(--accent-cyan)', title: 'Cyber Wave Matrix',
-            desc: 'Mesmerizing neon pulse waves scroll seamlessly across every screen. Tap any phone to send a synchronized ripple burst, toggle colors, speed, and glitch FX live!' }
+          {
+            icon: <QrCode size={22} />,
+            color: 'var(--accent-cyan)',
+            title: 'Instant QR Code Pairing',
+            desc: 'Zero app installs or setup. Friends point their camera at the master screen to link their phone to the multi-device grid in seconds.'
+          },
+          {
+            icon: <Layers size={22} />,
+            color: 'var(--accent-primary)',
+            title: 'Scalable 1 to 100 Phones',
+            desc: 'Hardware-accelerated viewport cropping engine divides media dynamically for any grid from standard 2×2 up to 100 phones.'
+          },
+          {
+            icon: <Sparkles size={22} />,
+            color: 'var(--accent-pink)',
+            title: 'Virtual Birthday Cake Party',
+            desc: 'Swipe a virtual knife across physical screens to slice the cake with synchronized physics, candle blowing, confetti, and music.'
+          },
+          {
+            icon: <Zap size={22} />,
+            color: 'var(--accent-cyan)',
+            title: 'Cyber Wave Matrix',
+            desc: 'Neon energy pulses flowing continuously across every device. Tap any phone to send live synchronized ripples across the entire room.'
+          }
         ].map((card, i) => (
-          <div key={i} className="nm-card" style={{ padding: '32px 26px' }}>
-            <div className="nm-icon-box" style={{ marginBottom: '20px', color: card.color }}>
+          <div key={i} className="glass-panel" style={{ padding: '28px 24px' }}>
+            <div className="nm-icon-box" style={{ width: '42px', height: '42px', marginBottom: '16px', color: card.color, background: 'var(--nm-surface-light)' }}>
               {card.icon}
             </div>
-            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-heading)', marginBottom: '10px', fontWeight: 700 }}>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)', marginBottom: '8px', fontWeight: 700 }}>
               {card.title}
             </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', lineHeight: 1.55 }}>
               {card.desc}
             </p>
           </div>
         ))}
       </div>
 
-      {/* Social Trend Banner — large neumorphic card */}
-      <div className="nm-card" style={{
-        padding: '48px 30px',
+      {/* Social Banner */}
+      <div className="glass-panel" style={{
+        padding: '40px 24px',
         textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden'
+        background: 'linear-gradient(135deg, var(--nm-surface) 0%, var(--nm-surface-light) 100%)'
       }}>
         <div style={{
           display: 'inline-block',
-          fontSize: '0.85rem',
+          fontSize: '0.8rem',
           color: 'var(--accent-cyan)',
           textTransform: 'uppercase',
-          letterSpacing: '0.12em',
-          fontWeight: 800,
-          marginBottom: '10px'
+          letterSpacing: '0.1em',
+          fontWeight: 700,
+          marginBottom: '8px'
         }}>
-          Social Media Ready
+          Events • Parties • Gatherings
         </div>
-        <h2 style={{ fontSize: '2.1rem', color: 'var(--text-heading)', margin: '0 auto 14px', maxWidth: '750px', fontWeight: 800 }}>
+        <h2 style={{ fontSize: '1.8rem', color: 'var(--text-heading)', margin: '0 auto 10px', maxWidth: '680px', fontWeight: 800 }}>
           "When you meet friends or family, try this."
         </h2>
-        <p style={{ color: 'var(--text-muted)', maxWidth: '620px', margin: '0 auto', fontSize: '1rem', lineHeight: 1.6 }}>
-          Turn your gatherings, birthday parties, and hangouts into viral moments with an unforgettable synchronized multi-phone wall.
+        <p style={{ color: 'var(--text-muted)', maxWidth: '580px', margin: '0 auto', fontSize: '0.92rem', lineHeight: 1.6 }}>
+          Turn your gatherings, birthdays, and parties into viral moments with an unforgettable synchronized multi-screen wall.
         </p>
       </div>
     </div>
