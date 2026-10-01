@@ -145,8 +145,12 @@ export const registerPlaybackHandlers = (io, socket) => {
           waveColor: data?.color || session.interactiveState.waveColor || '#00ffff',
           waveSpeed: 1.0,
           glitchActive: false,
-          ripples: []
+          ripples: [],
+          customText: ''
         };
+      } else if (eventType === 'CUSTOM_TEXT') {
+        session.interactiveState.customText = data?.text || '';
+        session.interactiveState.textSize = data?.size || 32;
       }
 
       // Broadcast immediately to all connected devices in room

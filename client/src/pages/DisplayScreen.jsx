@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
   Maximize2,
   Minimize2,
@@ -19,8 +20,37 @@ import PositionGuideModal from '../components/PositionGuideModal';
 import { useSession } from '../hooks/useSession';
 import { usePlaybackSync } from '../hooks/usePlaybackSync';
 
-export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavigate }) {
-  const [inDisplayMode, setInDisplayMode] = useState(false);
+export default function DisplayScreen({
+  sessionId: propSessionId,
+  deviceId: propDeviceId,
+  deviceName: propDeviceName,
+  onNavigate: propOnNavigate
+}) {
+  const { sessionId: routeSessionId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const sessionId = (propSessionId || routeSessionId || '').trim();
+  const urlDeviceId = searchParams.get('deviceId');
+  const urlDeviceName = searchParams.get('deviceName');
+  const autoDisplay = searchParams.get('mode') === 'display' || searchParams.get('auto') === '1';
+
+  const [deviceId] = useState(() => {
+    return (
+      propDeviceId ||
+      urlDeviceId ||
+      (sessionId ? localStorage.getItem(`ms-device-${sessionId}`) : null) ||
+      sessionStorage.getItem('ms-device-id') ||
+      `disp-${Date.now()}`
+    );
+  });
+
+  const deviceName =
+    propDeviceName ||
+    urlDeviceName ||
+    sessionStorage.getItem('ms-device-name') ||
+    'Display Screen';
+
+  const [inDisplayMode, setInDisplayMode] = useState(autoDisplay);
   const [showPositionGuide, setShowPositionGuide] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false); // YouTube-style tap controls
@@ -29,15 +59,42 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
   const [timerRemaining, setTimerRemaining] = useState(null);
   const wakeLockRef = useRef(null);
 
+  // Sync to local/session storage
+  useEffect(() => {
+    if (sessionId && deviceId) {
+      try {
+        localStorage.setItem(`ms-device-${sessionId}`, deviceId);
+        sessionStorage.setItem('ms-device-id', deviceId);
+        sessionStorage.setItem('ms-session-id', sessionId);
+        sessionStorage.setItem('ms-device-name', deviceName);
+      } catch (e) {}
+    }
+  }, [sessionId, deviceId, deviceName]);
+
+  const onNavigate = (page, p = {}) => {
+    if (propOnNavigate) {
+      propOnNavigate(page, p);
+    } else {
+      if (page === 'home') window.location.href = '/';
+      else if (page === 'master') window.location.href = `/session/${p.sessionId || sessionId}`;
+    }
+  };
+
+  const isMasterDeviceId = deviceId?.startsWith('master') || deviceName?.includes('Master');
+
   // Hook for session & socket
   const { session, device, isConnected, clockOffset, socket } = useSession({
     sessionId,
     deviceId,
-    role: 'display',
+    role: isMasterDeviceId ? 'master+display' : 'display',
     deviceName
   });
 
-  const isMasterPhone = device?.isMaster || device?.role === 'master+display' || session?.masterGridDeviceId === deviceId;
+  const isMasterPhone =
+    isMasterDeviceId ||
+    device?.isMaster ||
+    device?.role === 'master+display' ||
+    session?.masterGridDeviceId === deviceId;
 
   // Hook for playback synchronization
   const {
@@ -212,15 +269,53 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
     return () => clearTimeout(timer);
   }, [showOverlay, inDisplayMode]);
 
+  if (!sessionId) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--clay-bg)',
+          padding: '20px',
+          textAlign: 'center'
+        }}
+      >
+        <div className="clay-card" style={{ padding: '36px', maxWidth: '420px', width: '100%' }}>
+          <AlertCircle size={48} color="var(--primary)" style={{ margin: '0 auto 16px' }} />
+          <h2 style={{ color: 'var(--text-heading)', marginBottom: '8px', fontWeight: 900 }}>No Session Specified</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '0.95rem' }}>
+            Please join or create a session to open display mode.
+          </p>
+          <button onClick={() => onNavigate('home')} className="btn-primary" style={{ width: '100%' }}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const defaultCyberMedia = {
+    id: 'exp-cyber-1',
+    name: 'Cyber Wave Matrix',
+    type: 'interactive',
+    category: 'Interactive',
+    subType: 'cyber',
+    thumbnail: 'https://images.pexels.com/photos/9784235/pexels-photo-9784235.jpeg'
+  };
+
   const layout = session?.layout || { rows: 2, cols: 2, total: 4 };
   const position = device?.position || { row: 0, col: 0, index: 0, label: 'Assigned Position' };
-  const media = session?.media;
+  const media = session?.media || defaultCyberMedia;
   const bezel = session?.bezel || { gapX: 3, gapY: 3, scale: 100, offsetX: 0, offsetY: 0 };
   const slotNumber = (position.index ?? 0) + 1;
   const phoneLabel = device?.deviceCode || `P${String(slotNumber).padStart(2, '0')}`;
 
   const isInteractiveCake = media?.type === 'interactive' && media?.subType === 'cake';
-  const isInteractiveCyber = media?.type === 'interactive' && media?.subType === 'cyber';
+  const isInteractiveCyber =
+    media?.type === 'interactive' &&
+    (media?.subType === 'cyber' || !media?.subType || media?.id === 'exp-cyber-1');
 
   // Session Ended Screen
   if (session?.status === 'ended') {
@@ -250,8 +345,8 @@ export default function DisplayScreen({ sessionId, deviceId, deviceName, onNavig
     );
   }
 
-  // Pending Host Approval Screen (Requirement 14)
-  if (device?.status === 'pending') {
+  // Pending Host Approval Screen (Requirement 14) - host phone is never blocked
+  if (device?.status === 'pending' && !isMasterPhone) {
     return (
       <div
         style={{

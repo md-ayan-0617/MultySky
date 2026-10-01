@@ -78,6 +78,10 @@ export function usePlaybackSync({ sessionId, isMaster = false, clockOffset = 0, 
         next.waveSpeed = 1.0;
         next.glitchActive = false;
         next.ripples = [];
+        next.customText = '';
+      } else if (eventType === 'CUSTOM_TEXT') {
+        next.customText = data?.text || '';
+        next.textSize = data?.size || 32;
       } else if (eventType === 'CYBER_RIPPLE') {
         next.ripples = [...(next.ripples || []).slice(-15), { globalX: data?.globalX || 0, globalY: data?.globalY || 0, t: data?.t || Date.now() }];
       }

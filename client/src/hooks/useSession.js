@@ -122,6 +122,12 @@ export function useSession({ sessionId, deviceId, role = 'display', deviceName =
     socket.on('layout-changed', handleLayoutChanged);
     socket.on('position-changed', handlePositionChanged);
     socket.on('media-changed', handleMediaChanged);
+    const handleMasterGridStatus = ({ joined, device: mDev }) => {
+      if (joined && mDev && (deviceId === mDev.id || deviceId?.startsWith('master-disp'))) {
+        setDevice(mDev);
+      }
+    };
+
     socket.on('bezel-changed', handleBezelChanged);
     socket.on('blackout-toggled', handleBlackoutToggled);
     socket.on('join-exit-media-updated', handleJoinExitMediaUpdated);
@@ -129,6 +135,7 @@ export function useSession({ sessionId, deviceId, role = 'display', deviceName =
     socket.on('device-approved', handleDeviceApproved);
     socket.on('device-rejected', handleDeviceRejected);
     socket.on('session-ended', handleSessionEnded);
+    socket.on('master-grid-status', handleMasterGridStatus);
 
     // Initial fetch fallback
     getSession(sessionId).then(res => {
@@ -161,6 +168,7 @@ export function useSession({ sessionId, deviceId, role = 'display', deviceName =
       socket.off('device-approved', handleDeviceApproved);
       socket.off('device-rejected', handleDeviceRejected);
       socket.off('session-ended', handleSessionEnded);
+      socket.off('master-grid-status', handleMasterGridStatus);
       unsubLocal();
     };
   }, [sessionId, deviceId, role, deviceName, measureClockDrift]);

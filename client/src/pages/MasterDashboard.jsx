@@ -32,7 +32,7 @@ export default function MasterDashboard({ sessionId: propSessionId, onNavigate: 
       if (page === 'home') routerNavigate('/');
       else if (page === 'create') routerNavigate('/create-session');
       else if (page === 'join') routerNavigate('/join');
-      else if (page === 'display') routerNavigate(`/display/${p.sessionId || sessionId}?deviceId=${p.deviceId}&deviceName=${encodeURIComponent(p.deviceName || '')}`);
+      else if (page === 'display') routerNavigate(`/display/${p.sessionId || sessionId}?deviceId=${p.deviceId}&deviceName=${encodeURIComponent(p.deviceName || '')}&mode=display`);
       else if (page === 'master') routerNavigate(`/session/${p.sessionId || sessionId}`);
       else if (page === 'gallery') routerNavigate('/gallery');
       else if (page === 'admin') routerNavigate('/admin');
@@ -120,6 +120,9 @@ export default function MasterDashboard({ sessionId: propSessionId, onNavigate: 
   };
 
   const handleOpenMasterDisplay = () => {
+    if (!masterDisplayDevice && socket) {
+      socket.emit('master:join-grid', { sessionId, preferredIndex: 0 });
+    }
     onNavigate('display', {
       sessionId,
       deviceId: masterDisplayDevice?.id || `master-disp-${sessionId}`,

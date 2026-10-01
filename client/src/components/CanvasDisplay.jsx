@@ -146,8 +146,10 @@ export default function CanvasDisplay({
 
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      const W = Math.max(rect.width || canvas.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 300) || 300, 1);
+      const H = Math.max(rect.height || canvas.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 200) || 200, 1);
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
 
       if (!isVideo && imageRef.current) {
         renderFrame(imageRef.current);

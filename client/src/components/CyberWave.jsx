@@ -50,8 +50,8 @@ export default function CyberWave({
     const setupCanvas = () => {
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-      const W = Math.max(1, Math.floor(rect.width || canvas.clientWidth || 300));
-      const H = Math.max(1, Math.floor(rect.height || canvas.clientHeight || 200));
+      const W = Math.max(1, Math.floor(rect.width || canvas.clientWidth || window.innerWidth || 300));
+      const H = Math.max(1, Math.floor(rect.height || canvas.clientHeight || window.innerHeight || 200));
       canvas.width = Math.floor(W * dpr);
       canvas.height = Math.floor(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -86,6 +86,7 @@ export default function CyberWave({
       const offsetX = col * W * (1 + gapX);
       const offsetY = row * H * (1 + gapY);
       const GLOBAL_W = Math.max(100, W * Math.max(1, totalCols) * (1 + gapX));
+      const GLOBAL_H = Math.max(100, H * Math.max(1, totalRows) * (1 + gapY));
 
       // ── Background ──────────────────────────────────────────────────────────
       ctx.fillStyle = '#000510';

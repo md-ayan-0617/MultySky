@@ -75,7 +75,7 @@ function AppContent({ theme, onToggleTheme }) {
     else if (target === 'gallery') navigate('/gallery');
     else if (target === 'admin') navigate('/admin');
     else if (target === 'master') navigate(`/session/${params.sessionId || ''}`);
-    else if (target === 'display') navigate(`/display/${params.sessionId}?deviceId=${params.deviceId}&deviceName=${encodeURIComponent(params.deviceName || '')}`);
+    else if (target === 'display') navigate(`/display/${params.sessionId}?deviceId=${params.deviceId || ''}&deviceName=${encodeURIComponent(params.deviceName || '')}&mode=display`);
   };
 
   return (
@@ -113,7 +113,7 @@ function AppContent({ theme, onToggleTheme }) {
             <JoinSession
               onNavigate={handleNav}
               onJoined={(session, device) =>
-                navigate(`/display/${session.id}?deviceId=${device.id}&deviceName=${encodeURIComponent(device.name)}`)
+                navigate(`/display/${session.id}?deviceId=${device.id}&deviceName=${encodeURIComponent(device.name)}&mode=display`)
               }
             />
           }
@@ -125,7 +125,7 @@ function AppContent({ theme, onToggleTheme }) {
             <JoinSession
               onNavigate={handleNav}
               onJoined={(session, device) =>
-                navigate(`/display/${session.id}?deviceId=${device.id}&deviceName=${encodeURIComponent(device.name)}`)
+                navigate(`/display/${session.id}?deviceId=${device.id}&deviceName=${encodeURIComponent(device.name)}&mode=display`)
               }
             />
           }
@@ -135,9 +135,17 @@ function AppContent({ theme, onToggleTheme }) {
           path="/session/:sessionId"
           element={
             <MasterDashboard
+              onNavigate={handleNav}
               theme={theme}
               onToggleTheme={onToggleTheme}
             />
+          }
+        />
+
+        <Route
+          path="/display"
+          element={
+            <Navigate to="/join" replace />
           }
         />
 
