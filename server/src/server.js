@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 
 import sessionRoutes from './routes/sessionRoutes.js';
 import mediaRoutes from './routes/mediaRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import galleryRoutes from './routes/galleryRoutes.js';
 import { registerSessionHandlers } from './sockets/sessionSocket.js';
 import { registerPlaybackHandlers } from './sockets/playbackSocket.js';
 
@@ -39,6 +41,8 @@ app.use('/uploads', express.static(uploadsDir));
 // API Routes
 app.use('/api/session', sessionRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api', galleryRoutes);
 
 // Helper endpoint to get server local IP addresses (useful for QR code on mobile devices)
 app.get('/api/server-info', (req, res) => {

@@ -64,6 +64,13 @@ export default function Header({ currentPage, onNavigate, theme, onToggleTheme }
           </button>
 
           <button
+            onClick={() => handleNav('gallery')}
+            className={`nav-link ${currentPage === 'gallery' ? 'active' : ''}`}
+          >
+            Gallery
+          </button>
+
+          <button
             onClick={() => handleNav('create')}
             className={`nav-link ${currentPage === 'create' ? 'active' : ''}`}
           >
@@ -140,6 +147,13 @@ export default function Header({ currentPage, onNavigate, theme, onToggleTheme }
             className="mobile-drawer-link"
           >
             ✨ Features (1–100 Phones)
+          </button>
+
+          <button
+            onClick={() => handleNav('gallery')}
+            className="mobile-drawer-link"
+          >
+            🖼️ Gallery
           </button>
 
           <button

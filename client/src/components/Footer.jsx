@@ -216,12 +216,22 @@ export default function Footer({ onNavigate }) {
             </li>
             <li>
               <button
-                onClick={() => handleNav('home', 'faq')}
+                onClick={() => handleNav('gallery')}
                 style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', fontWeight: 600, textAlign: 'left' }}
-                onMouseEnter={e => e.currentTarget.style.color = 'var(--clay-coral)'}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-blue, #2563EB)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
               >
-                Frequently Asked Questions
+                Public Gallery
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav('admin')}
+                style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', fontWeight: 600, textAlign: 'left' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-blue, #2563EB)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Admin
               </button>
             </li>
             <li>

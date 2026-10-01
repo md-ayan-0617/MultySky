@@ -6,33 +6,33 @@
 /* ── LIGHT / CLAY PALETTE (Default) ─────────────────────────────────── */
 :root,
 body[data-theme='light'] {
-  /* Warm soft tinted canvas background */
-  --clay-bg: #F8F5EE;
-  --nm-bg: #F8F5EE;
+  /* Clean tinted canvas background */
+  --clay-bg: #F0F4F8;
+  --nm-bg: #F0F4F8;
   --clay-surface: #FFFFFF;
   --nm-surface: #FFFFFF;
-  --clay-surface-warm: #FDFBF7;
-  --nm-surface-light: #FAF7F2;
-  --nm-surface-dark: #F0ECE1;
+  --clay-surface-warm: #F8FAFC;
+  --nm-surface-light: #F1F5F9;
+  --nm-surface-dark: #E2E8F0;
   --surface-elevated: #FFFFFF;
 
   /* Solid Pastel Clay Colors */
-  --clay-lavender: #B9A7F7;
-  --clay-blue: #9ED7F2;
-  --clay-mint: #9DDEB8;
-  --clay-peach: #FFB89F;
-  --clay-pink: #F6B8D0;
-  --clay-yellow: #F7D878;
-  --clay-coral: #FF806F;
+  --clay-lavender: #A5B4FC;
+  --clay-blue: #93C5FD;
+  --clay-mint: #86EFAC;
+  --clay-peach: #FDBA74;
+  --clay-pink: #F472B6;
+  --clay-yellow: #FDE047;
+  --clay-coral: #2563EB; /* Blue primary */
 
-  /* Typography / Text — Dark Warm Charcoal (Never pure black) */
-  --text-primary: #302D3D;
-  --text-main: #302D3D;
-  --text-secondary: #706A7C;
-  --text-muted: #8E879B;
-  --text-dim: #A8A1B4;
-  --text-heading: #262332;
-  --text-label: #524C5E;
+  /* Typography / Text — Slate Charcoal */
+  --text-primary: #1E293B;
+  --text-main: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-dim: #94A3B8;
+  --text-heading: #0F172A;
+  --text-label: #334155;
   --text-inverse: #FFFFFF;
 
   --font-heading: 'Nunito', 'Outfit', -apple-system, sans-serif;
@@ -40,133 +40,153 @@ body[data-theme='light'] {
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Header Theme Background */
-  --header-bg: rgba(248, 245, 238, 0.94);
-  --header-border: 1px solid rgba(48, 45, 61, 0.08);
+  --header-bg: rgba(240, 244, 248, 0.94);
+  --header-border: 1px solid rgba(37, 99, 235, 0.15);
 
-  /* Borders — Soft, barely visible warm borders */
-  --border-subtle: 2px solid rgba(48, 45, 61, 0.05);
-  --border-card: 2px solid rgba(255, 255, 255, 0.9);
-  --border-card-hover: 2px solid var(--clay-lavender);
-  --border-input: 2px solid rgba(48, 45, 61, 0.08);
-  --border-input-focus: 2px solid var(--clay-coral);
+  /* Borders — Soft, crisp blue-tinted borders */
+  --border-subtle: 1px solid rgba(37, 99, 235, 0.12);
+  --border-card: 1px solid rgba(255, 255, 255, 0.9);
+  --border-card-hover: 1px solid #3B82F6;
+  --border-input: 1px solid rgba(37, 99, 235, 0.2);
+  --border-input-focus: 2px solid #2563EB;
 
-  /* Accent Colors */
-  --accent-primary: #FF806F;
-  --accent-primary-hover: #F26A57;
-  --accent-secondary: #9ED7F2;
-  --accent-cyan: #72C7EB;
-  --accent-pink: #F6B8D0;
-  --accent-emerald: #9DDEB8;
-  --accent-amber: #F7D878;
-  --accent-rose: #FF806F;
+  /* Blue Primary Accent Colors */
+  --accent-primary: #2563EB;
+  --accent-primary-hover: #1D4ED8;
+  --accent-blue: #3B82F6;
+  --accent-highlight: #60A5FA;
+  --accent-secondary: #60A5FA;
+  --accent-cyan: #38BDF8;
+  --accent-pink: #F472B6;
+  --accent-emerald: #10B981;
+  --accent-amber: #F59E0B;
+  --accent-rose: #EF4444;
 
-  /* Clay Soft Colored Shadows (Light: Top Left, Depth: Bottom Right) */
-  --shadow-sm: 0 4px 10px -2px rgba(48, 45, 61, 0.06), inset 1px 1px 2px #FFFFFF, inset -1px -1px 2px rgba(48, 45, 61, 0.03);
-  --shadow-md: 0 10px 22px -5px rgba(48, 45, 61, 0.08), inset 2px 2px 4px #FFFFFF, inset -2px -2px 4px rgba(48, 45, 61, 0.03);
-  --shadow-lg: 0 16px 32px -6px rgba(48, 45, 61, 0.11), inset 2px 2px 5px #FFFFFF, inset -2px -2px 5px rgba(48, 45, 61, 0.04);
-  --shadow-float: 0 22px 44px -8px rgba(48, 45, 61, 0.14), inset 2px 2px 6px #FFFFFF, inset -2px -2px 6px rgba(48, 45, 61, 0.04);
+  /* Clay Soft Colored Shadows */
+  --shadow-sm: 0 4px 10px -2px rgba(15, 23, 42, 0.06), inset 1px 1px 2px #FFFFFF;
+  --shadow-md: 0 10px 22px -5px rgba(15, 23, 42, 0.08), inset 2px 2px 4px #FFFFFF;
+  --shadow-lg: 0 16px 32px -6px rgba(15, 23, 42, 0.11), inset 2px 2px 5px #FFFFFF;
+  --shadow-float: 0 22px 44px -8px rgba(15, 23, 42, 0.14), inset 2px 2px 6px #FFFFFF;
 
   --nm-raised: var(--shadow-md);
   --nm-raised-sm: var(--shadow-sm);
   --nm-raised-lg: var(--shadow-lg);
-  --nm-inset: inset 2px 2px 5px rgba(48, 45, 61, 0.08), inset -2px -2px 4px rgba(255, 255, 255, 0.7);
-  --nm-inset-sm: inset 1px 1px 3px rgba(48, 45, 61, 0.06), inset -1px -1px 2px rgba(255, 255, 255, 0.7);
-  --nm-pressed: inset 3px 3px 6px rgba(48, 45, 61, 0.12), inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+  --nm-inset: inset 2px 2px 5px rgba(15, 23, 42, 0.08), inset -2px -2px 4px rgba(255, 255, 255, 0.7);
+  --nm-inset-sm: inset 1px 1px 3px rgba(15, 23, 42, 0.06), inset -1px -1px 2px rgba(255, 255, 255, 0.7);
+  --nm-pressed: inset 3px 3px 6px rgba(15, 23, 42, 0.12), inset -2px -2px 4px rgba(255, 255, 255, 0.5);
 
-  /* Specific Hue-Matched Clay Shadows */
-  --clay-shadow-coral: 0 10px 22px -4px rgba(255, 128, 111, 0.45), 0 4px 8px -2px rgba(255, 128, 111, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.65), inset -2px -2px 4px rgba(180, 50, 40, 0.12);
-  --clay-shadow-lavender: 0 10px 22px -4px rgba(185, 167, 247, 0.45), 0 4px 8px -2px rgba(185, 167, 247, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.7), inset -2px -2px 4px rgba(90, 70, 150, 0.1);
-  --clay-shadow-blue: 0 10px 22px -4px rgba(158, 215, 242, 0.45), 0 4px 8px -2px rgba(158, 215, 242, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.75), inset -2px -2px 4px rgba(50, 120, 160, 0.1);
-  --clay-shadow-mint: 0 10px 22px -4px rgba(157, 222, 184, 0.45), 0 4px 8px -2px rgba(157, 222, 184, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.7), inset -2px -2px 4px rgba(40, 130, 80, 0.1);
-  --clay-shadow-peach: 0 10px 22px -4px rgba(255, 184, 159, 0.45), 0 4px 8px -2px rgba(255, 184, 159, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.7), inset -2px -2px 4px rgba(170, 70, 40, 0.1);
-  --clay-shadow-pink: 0 10px 22px -4px rgba(246, 184, 208, 0.45), 0 4px 8px -2px rgba(246, 184, 208, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.7), inset -2px -2px 4px rgba(160, 60, 100, 0.1);
-  --clay-shadow-yellow: 0 10px 22px -4px rgba(247, 216, 120, 0.45), 0 4px 8px -2px rgba(247, 216, 120, 0.25), inset 2px 2px 4px rgba(255, 255, 255, 0.8), inset -2px -2px 4px rgba(160, 120, 20, 0.1);
+  /* Specific Hue-Matched Clay Shadows (Blue Theme) */
+  --clay-shadow-coral: 0 8px 18px -4px rgba(37, 99, 235, 0.35), 0 3px 6px -2px rgba(37, 99, 235, 0.2);
+  --clay-shadow-blue: 0 8px 18px -4px rgba(37, 99, 235, 0.35), 0 3px 6px -2px rgba(37, 99, 235, 0.2);
+  --clay-shadow-lavender: 0 8px 18px -4px rgba(165, 180, 252, 0.35);
+  --clay-shadow-mint: 0 8px 18px -4px rgba(134, 239, 172, 0.35);
+  --clay-shadow-peach: 0 8px 18px -4px rgba(253, 186, 116, 0.35);
+  --clay-shadow-pink: 0 8px 18px -4px rgba(244, 114, 182, 0.35);
+  --clay-shadow-yellow: 0 8px 18px -4px rgba(253, 224, 71, 0.35);
 
-  /* Radii — Generous Clay Rounding */
+  /* Radii — Modern Rounded */
   --radius-xs: 8px;
-  --radius-sm: 14px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
-  --radius-xl: 36px;
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-full: 9999px;
 
   /* Buttons */
-  --btn-primary-bg: #FF806F;
-  --btn-primary-hover: #FA7361;
-  --btn-primary-active: #EB604D;
-  --btn-primary-border: 2px solid rgba(255, 255, 255, 0.6);
-  --btn-primary-glow: rgba(255, 128, 111, 0.35);
+  --btn-primary-bg: #2563EB;
+  --btn-primary-hover: #1D4ED8;
+  --btn-primary-active: #1E40AF;
+  --btn-primary-border: 1px solid rgba(255, 255, 255, 0.4);
+  --btn-primary-glow: rgba(37, 99, 235, 0.25);
   --btn-primary-text: #FFFFFF;
 
   --btn-secondary-bg: #FFFFFF;
-  --btn-secondary-hover: #FAF7F2;
-  --btn-secondary-active: #F2ECE0;
-  --btn-secondary-border: 2px solid rgba(255, 255, 255, 0.85);
+  --btn-secondary-hover: #F1F5F9;
+  --btn-secondary-active: #E2E8F0;
+  --btn-secondary-border: 1px solid rgba(37, 99, 235, 0.2);
 
-  --btn-danger-bg: #FFF0ED;
-  --btn-danger-hover: #FFE2DC;
-  --btn-danger-active: #FFD2C8;
-  --btn-danger-text: #E55341;
-  --btn-danger-border: 2px solid #FFC9C1;
-  --btn-danger-glow: rgba(229, 83, 65, 0.2);
+  --btn-danger-bg: #FEF2F2;
+  --btn-danger-hover: #FEE2E2;
+  --btn-danger-active: #FECACA;
+  --btn-danger-text: #DC2626;
+  --btn-danger-border: 1px solid #FCA5A5;
+  --btn-danger-glow: rgba(220, 38, 38, 0.2);
 
-  --icon-box-bg: #FAF7F2;
-  --icon-box-border: 2px solid rgba(255, 255, 255, 0.9);
+  --icon-box-bg: #F1F5F9;
+  --icon-box-border: 1px solid rgba(37, 99, 235, 0.15);
 
   --input-bg: #FFFFFF;
-  --input-text: #302D3D;
-  --input-focus-glow: rgba(255, 128, 111, 0.25);
+  --input-text: #1E293B;
+  --input-focus-glow: rgba(37, 99, 235, 0.2);
 
-  --scrollbar-thumb-bg: #E4DEC8;
-  --scrollbar-thumb-hover: #CEBFA1;
+  --scrollbar-thumb-bg: #CBD5E1;
+  --scrollbar-thumb-hover: #94A3B8;
 
   --gradient-text: none;
 }
 
-/* ── DARK THEME (Optional high contrast night mode) ──────────────────── */
+/* ── DARK THEME (Futuristic Cyber Blue & Deep Navy) ──────────────────── */
 body[data-theme='dark'] {
-  --clay-bg: #1A1824;
-  --nm-bg: #1A1824;
-  --clay-surface: #252233;
-  --nm-surface: #252233;
-  --clay-surface-warm: #2C283D;
-  --nm-surface-light: #2E2940;
-  --nm-surface-dark: #1E1C2B;
-  --surface-elevated: #2E2A42;
+  --clay-bg: #11111B;
+  --nm-bg: #11111B;
+  --clay-surface: #1E1E30;
+  --nm-surface: #1E1E30;
+  --clay-surface-warm: #161625;
+  --nm-surface-light: #25253D;
+  --nm-surface-dark: #12121E;
+  --surface-elevated: #282842;
 
-  --text-primary: #F5F3FA;
-  --text-main: #F5F3FA;
-  --text-secondary: #B6AFC5;
-  --text-muted: #8E879E;
-  --text-dim: #6F6980;
+  --text-primary: #F8FAFC;
+  --text-main: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-dim: #475569;
   --text-heading: #FFFFFF;
-  --text-label: #D5CEE5;
+  --text-label: #CBD5E1;
 
   /* Header Theme Background */
-  --header-bg: rgba(26, 24, 36, 0.94);
-  --header-border: 1px solid rgba(255, 255, 255, 0.08);
+  --header-bg: rgba(17, 17, 27, 0.94);
+  --header-border: 1px solid rgba(96, 165, 250, 0.2);
 
-  --border-subtle: 2px solid rgba(255, 255, 255, 0.06);
-  --border-card: 2px solid rgba(255, 255, 255, 0.08);
-  --border-card-hover: 2px solid var(--clay-lavender);
-  --border-input: 2px solid rgba(255, 255, 255, 0.1);
-  --border-input-focus: 2px solid var(--clay-coral);
+  --border-subtle: 1px solid rgba(96, 165, 250, 0.15);
+  --border-card: 1px solid rgba(96, 165, 250, 0.25);
+  --border-card-hover: 1px solid #60A5FA;
+  --border-input: 1px solid rgba(96, 165, 250, 0.2);
+  --border-input-focus: 2px solid #3B82F6;
 
-  --shadow-sm: 0 4px 10px -2px rgba(0, 0, 0, 0.35), inset 1px 1px 2px rgba(255, 255, 255, 0.08);
-  --shadow-md: 0 10px 22px -5px rgba(0, 0, 0, 0.45), inset 2px 2px 4px rgba(255, 255, 255, 0.08);
-  --shadow-lg: 0 16px 32px -6px rgba(0, 0, 0, 0.55), inset 2px 2px 5px rgba(255, 255, 255, 0.09);
-  --shadow-float: 0 22px 44px -8px rgba(0, 0, 0, 0.65), inset 2px 2px 6px rgba(255, 255, 255, 0.1);
+  --accent-primary: #3B82F6;
+  --accent-primary-hover: #2563EB;
+  --clay-coral: #3B82F6;
 
-  --btn-secondary-bg: #2C283D;
-  --btn-secondary-hover: #35304B;
-  --btn-secondary-active: #242033;
-  --btn-secondary-border: 2px solid rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 4px 10px -2px rgba(0, 0, 0, 0.4), 0 0 10px rgba(59, 130, 246, 0.08);
+  --shadow-md: 0 10px 22px -5px rgba(0, 0, 0, 0.5), 0 0 16px rgba(59, 130, 246, 0.12);
+  --shadow-lg: 0 16px 32px -6px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.15);
+  --shadow-float: 0 22px 44px -8px rgba(0, 0, 0, 0.7), 0 0 24px rgba(59, 130, 246, 0.2);
 
-  --input-bg: #1E1C2B;
-  --input-text: #F5F3FA;
+  --clay-shadow-coral: 0 8px 18px -4px rgba(59, 130, 246, 0.4), 0 0 12px rgba(96, 165, 250, 0.25);
 
-  --scrollbar-thumb-bg: #35304B;
-  --scrollbar-thumb-hover: #484165;
+  --btn-primary-bg: #2563EB;
+  --btn-primary-hover: #3B82F6;
+  --btn-primary-active: #1D4ED8;
+  --btn-primary-glow: rgba(59, 130, 246, 0.35);
+
+  --btn-secondary-bg: #1E1E30;
+  --btn-secondary-hover: #282842;
+  --btn-secondary-active: #161625;
+  --btn-secondary-border: 1px solid rgba(96, 165, 250, 0.25);
+
+  --btn-danger-bg: rgba(239, 68, 68, 0.15);
+  --btn-danger-hover: rgba(239, 68, 68, 0.25);
+  --btn-danger-active: rgba(239, 68, 68, 0.35);
+  --btn-danger-text: #F87171;
+  --btn-danger-border: 1px solid rgba(239, 68, 68, 0.4);
+  --btn-danger-glow: rgba(239, 68, 68, 0.3);
+
+  --input-bg: #12121E;
+  --input-text: #F8FAFC;
+
+  --scrollbar-thumb-bg: #282842;
+  --scrollbar-thumb-hover: #3E3E66;
 }
 
 /* ── BASE RESETS ─────────────────────────────────────────────────────── */

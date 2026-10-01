@@ -186,6 +186,37 @@ export default function CyberWave({
         ctx.shadowBlur = 0;
       });
 
+      // ── Animated User-Controlled Text Across Grid (Requirement 9) ─────────
+      const displayText = interactiveState?.customText || 'MULTISCREEN CYBER MATRIX';
+      if (displayText && displayText.trim()) {
+        ctx.save();
+        const baseFontSize = (interactiveState?.textSize || 30);
+        ctx.font = `900 ${baseFontSize}px "JetBrains Mono", monospace, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const glowMultiplier = interactiveState?.glowBrightness || 1.2;
+        ctx.shadowColor = `rgba(${r},${g},${b},0.8)`;
+        ctx.shadowBlur = Math.round(12 * glowMultiplier);
+
+        // Smooth wave distortion and movement across the whole wall
+        const speedFactor = speed * 60;
+        const cycleWidth = GLOBAL_W + 600;
+        const globalTextX = ((t * speedFactor) % cycleWidth) - 300;
+        const localTextX = globalTextX - offsetX + W / 2;
+        const localTextY = H / 2 + Math.sin(t * 2.5 + col) * (8 * (interactiveState?.waveIntensity || 1));
+
+        // Text fill with bright cyan/blue highlight
+        ctx.fillStyle = `rgba(255, 255, 255, 0.95)`;
+        ctx.fillText(displayText.toUpperCase(), localTextX, localTextY);
+
+        ctx.strokeStyle = `rgba(${r},${g},${b},0.7)`;
+        ctx.lineWidth = 1;
+        ctx.strokeText(displayText.toUpperCase(), localTextX, localTextY);
+
+        ctx.restore();
+      }
+
       // ── Glitch Effect ────────────────────────────────────────────────────────
       if (glitchActive && W > 10 && H > 10) {
         const numSlices = Math.floor(Math.random() * 4) + 2;
@@ -242,7 +273,7 @@ export default function CyberWave({
       window.removeEventListener('resize', handleResize);
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
-  }, [row, col, totalRows, totalCols, bezel, waveColor, waveSpeed, glitchActive, isSimulator]);
+  }, [row, col, totalRows, totalCols, bezel, waveColor, waveSpeed, glitchActive, isSimulator, interactiveState]);
 
   // Touch / Click → emit CYBER_RIPPLE event
   const handlePointerDown = useCallback((e) => {

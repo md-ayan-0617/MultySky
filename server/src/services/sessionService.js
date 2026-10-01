@@ -87,12 +87,12 @@ export const createSession = ({ masterDeviceId = null, layoutId = '2x2', initial
     layout,
     devices: [], // list of connected display devices (up to 100)
     media: initialMedia || {
-      id: 'exp-cake-1',
-      name: 'Virtual Birthday Cake Party',
+      id: 'exp-cyber-1',
+      name: 'Cyber Wave Matrix',
       type: 'interactive',
       category: 'Interactive',
-      subType: 'cake',
-      thumbnail: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80'
+      subType: 'cyber',
+      thumbnail: 'https://images.pexels.com/photos/9784235/pexels-photo-9784235.jpeg'
     },
     joinMedia: {
       id: 'join-default',

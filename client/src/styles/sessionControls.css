@@ -1,0 +1,797 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SESSION CONSOLE & INTERACTIVE ANIMATION CONTROLS (BLUE THEME)
+   Mobile-First, Pure CSS, Zero Tailwind
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Compact Session Control Panel (Mobile Console) ─────────────── */
+.session-control-panel {
+  background: var(--nm-surface, #1e1e30);
+  border-bottom: 1.5px solid rgba(59, 130, 246, 0.2);
+  padding: 12px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+
+.session-control-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.session-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-logo-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.session-title-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-brand-name {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--text-heading, #fff);
+  letter-spacing: -0.02em;
+}
+
+.session-code-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 999px);
+}
+
+.code-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.code-value {
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #60a5fa;
+  letter-spacing: 1px;
+}
+
+.session-status-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 999px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.session-status-badge.waiting {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.session-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 999px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.session-actions-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1.5fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.session-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-radius: 9px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.session-btn-primary {
+  width: 100%;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.session-btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.session-secondary-actions,
+.session-utility-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.session-secondary-actions .session-btn,
+.session-utility-actions .session-btn {
+  flex: 1;
+}
+
+.session-btn-secondary {
+  background: #27273a;
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.session-btn-secondary:hover {
+  background: #32324a;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.session-btn-active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.session-btn-utility {
+  background: #20202e;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.session-btn-utility.blackout-active {
+  background: #000;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.session-btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.session-btn-danger:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* ── 2. Animation Mode Selector ─────────────────────────────────────── */
+.animation-mode-container {
+  background: #1e1e30;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 14px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.animation-mode-header {
+  margin-bottom: 14px;
+}
+
+.animation-mode-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mode-badge-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mode-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.mode-section-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.animation-modes-track {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+
+.animation-modes-track::-webkit-scrollbar {
+  height: 4px;
+}
+
+.animation-modes-track::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
+.mode-card-btn {
+  flex: 0 0 160px;
+  background: #151522;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-card-btn:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.mode-card-btn.active {
+  background: rgba(37, 99, 235, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+}
+
+.mode-card-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  transition: transform 0.2s ease;
+}
+
+.mode-card-btn.active .mode-card-icon-wrap {
+  transform: scale(1.1);
+}
+
+.mode-card-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.mode-card-desc {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  line-height: 1.25;
+}
+
+/* ── 3. Custom Animated Text Input ─────────────────────────────────── */
+.custom-message-card {
+  background: #1e1e30;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 14px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.custom-message-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.message-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.message-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-card-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.message-card-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.message-presets-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.message-preset-chip {
+  background: #151522;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #94a3b8;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.message-preset-chip:hover {
+  color: #fff;
+  border-color: #3b82f6;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.custom-message-form {
+  margin-bottom: 10px;
+}
+
+.message-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.custom-text-input {
+  flex-grow: 1;
+  background: #151522;
+  border: 1.5px solid rgba(59, 130, 246, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  font-weight: 600;
+}
+
+.custom-text-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.message-send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 16px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.custom-message-ticker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #12121e;
+  border-radius: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.ticker-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #3b82f6;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.ticker-marquee {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  color: #60a5fa;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 4. Cyber Wave Controls ─────────────────────────────────────────── */
+.cyber-controls-card {
+  background: #1e1e30;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 14px;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.cyber-controls-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cyber-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cyber-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cyber-controls-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.cyber-controls-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.cyber-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #151522;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cyber-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.control-setting-box {
+  background: #151522;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.control-setting-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.color-swatches-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.color-swatch-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.color-swatch-btn.active {
+  border-color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+.cyber-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cyber-slider {
+  flex-grow: 1;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.slider-value-badge {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #60a5fa;
+  min-width: 32px;
+  text-align: right;
+}
+
+.cyber-fx-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.fx-toggle-btn {
+  flex: 1;
+  background: #1f1f33;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fx-toggle-btn.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
+/* ── 5. Cake Party Controls (Conditional Only) ───────────────────────── */
+.cake-party-card {
+  background: #1e1e30;
+  border: 1.5px solid rgba(244, 114, 182, 0.3);
+  border-radius: 14px;
+  padding: 18px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(244, 114, 182, 0.08);
+}
+
+.cake-party-header {
+  margin-bottom: 14px;
+}
+
+.cake-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cake-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(244, 114, 182, 0.15);
+  color: #f472b6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cake-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cake-party-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.cake-live-tag {
+  background: rgba(244, 114, 182, 0.15);
+  color: #f472b6;
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.cake-party-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.cake-actions-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.cake-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cake-action-btn.cut-cake {
+  background: #ec4899;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35);
+}
+
+.cake-action-btn.cut-cake:hover {
+  background: #db2777;
+}
+
+.cake-action-btn.blow-candles {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.cake-action-btn.blow-candles:hover {
+  background: #d97706;
+}
+
+.cake-action-btn.confetti {
+  background: #8b5cf6;
+  color: #fff;
+}
+
+.cake-action-btn.confetti:hover {
+  background: #7c3aed;
+}
+
+.cake-action-btn.reset {
+  background: #1f1f33;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cake-action-btn.reset:hover {
+  background: #2b2b45;
+}
+
+/* ── 6. Mobile Responsiveness (320px – 412px) ────────────────────────── */
+@media (max-width: 580px) {
+  .session-control-panel {
+    padding: 10px 12px;
+  }
+
+  .session-control-top {
+    margin-bottom: 10px;
+  }
+
+  .session-actions-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .session-primary-action .session-btn {
+    padding: 11px 14px;
+    font-size: 0.92rem;
+  }
+
+  .session-secondary-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .session-secondary-actions .session-btn {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .session-utility-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .session-utility-actions .session-btn {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .mode-card-btn {
+    flex: 0 0 135px;
+    padding: 10px 8px;
+  }
+
+  .message-presets-wrap {
+    display: none;
+  }
+
+  .custom-text-input {
+    font-size: 0.82rem;
+    padding: 8px 10px;
+  }
+
+  .message-send-btn {
+    padding: 0 12px;
+    font-size: 0.8rem;
+  }
+
+  .cake-actions-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .session-brand-name {
+    font-size: 0.98rem;
+  }
+
+  .code-value {
+    font-size: 0.78rem;
+  }
+
+  .session-logo-badge {
+    width: 30px;
+    height: 30px;
+  }
+}

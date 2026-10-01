@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Smartphone, QrCode, Power, Settings, RefreshCw, Radio, Layers, Volume2, Sparkles, ExternalLink, Clock, Maximize2, ShieldAlert, Check, X, Eye, Play, Pause, RotateCcw, AlertTriangle } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  Smartphone, QrCode, Power, Settings, RefreshCw, Radio, Layers, Volume2, 
+  Sparkles, ExternalLink, Clock, Maximize2, ShieldAlert, Check, X, Eye, 
+  Play, Pause, RotateCcw, AlertTriangle 
+} from 'lucide-react';
 import QRCodeModal from '../components/QRCodeModal';
 import LayoutSelector from '../components/LayoutSelector';
 import DeviceList from '../components/DeviceList';
@@ -7,11 +12,35 @@ import MediaLibrary from '../components/MediaLibrary';
 import PlaybackControls from '../components/PlaybackControls';
 import BezelSettings from '../components/BezelSettings';
 import MultiScreenSimulator from '../components/MultiScreenSimulator';
+import SessionControlPanel from '../components/SessionControlPanel';
+import AnimationModeSelector from '../components/AnimationModeSelector';
+import CustomMessageInput from '../components/CustomMessageInput';
+import CyberWaveControls from '../components/CyberWaveControls';
+import CakePartyControls from '../components/CakePartyControls';
+
 import { useSession } from '../hooks/useSession';
 import { usePlaybackSync } from '../hooks/usePlaybackSync';
 import { updateLayout, endSession, updateDevicePosition, removeDevice, getServerInfo } from '../services/api';
 
-export default function MasterDashboard({ sessionId, onNavigate }) {
+export default function MasterDashboard({ sessionId: propSessionId, onNavigate: propOnNavigate, theme, onToggleTheme }) {
+  const params = useParams();
+  const routerNavigate = useNavigate();
+  const sessionId = propSessionId || params.sessionId;
+
+  const onNavigate = (page, p = {}) => {
+    if (propOnNavigate) {
+      propOnNavigate(page, p);
+    } else {
+      if (page === 'home') routerNavigate('/');
+      else if (page === 'create') routerNavigate('/create-session');
+      else if (page === 'join') routerNavigate('/join');
+      else if (page === 'display') routerNavigate(`/display/${p.sessionId || sessionId}?deviceId=${p.deviceId}&deviceName=${encodeURIComponent(p.deviceName || '')}`);
+      else if (page === 'master') routerNavigate(`/session/${p.sessionId || sessionId}`);
+      else if (page === 'gallery') routerNavigate('/gallery');
+      else if (page === 'admin') routerNavigate('/admin');
+    }
+  };
+
   const [isQrOpen, setIsQrOpen] = useState(false);
   const [isEndSessionOpen, setIsEndSessionOpen] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
@@ -25,6 +54,9 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
   const [timerRemaining, setTimerRemaining] = useState(null);
   const [blackout, setBlackout] = useState(false);
   const [mediaPickerType, setMediaPickerType] = useState(null); // 'join' | 'exit' | null
+
+  // Active animation mode state (default to cyber-wave)
+  const [activeMode, setActiveMode] = useState('cyber-wave');
 
   // Hook for session state & socket events
   const { session, isConnected, socket, clockOffset } = useSession({
@@ -64,9 +96,18 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
   const connectedCount = devices.filter(d => d.status === 'ready').length;
   const pendingDevices = devices.filter(d => d.status === 'pending');
 
-  // Master Grid Display Integration (Requirement 1, 2, 3)
+  // Master Grid Display Integration
   const masterDisplayDevice = devices.find(d => d.isMaster && d.status !== 'disconnected');
   const isMasterInGrid = !!masterDisplayDevice || !!session?.masterJoinedGrid;
+
+  // Sync activeMode if session media changes
+  useEffect(() => {
+    if (session?.media?.subType === 'cake') {
+      setActiveMode('cake');
+    } else if (session?.media?.subType === 'cyber' || session?.media?.id === 'exp-cyber-1') {
+      setActiveMode('cyber-wave');
+    }
+  }, [session?.media?.id, session?.media?.subType]);
 
   const handleMasterJoinGrid = (preferredIndex = 0) => {
     if (socket) {
@@ -88,7 +129,6 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
     });
   };
 
-  // Socket handlers
   const handleSelectLayout = (layout) => {
     const layoutId = typeof layout === 'object' ? layout.id : layout;
     if (socket) {
@@ -187,7 +227,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
     }
   };
 
-  // Synchronized Timer handlers (Requirement 9)
+  // Synchronized Timer handlers
   const handleStartTimer = (sec = timerDuration) => {
     setTimerDuration(sec);
     setTimerActive(true);
@@ -211,7 +251,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
     }
   };
 
-  // Listen for timer synchronization
+  // Timer sync listener
   useEffect(() => {
     if (!socket) return;
     let interval = null;
@@ -260,136 +300,53 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
     }
   };
 
+  // Mode change handler
+  const handleSelectMode = (modeId) => {
+    setActiveMode(modeId);
+    if (modeId === 'cake') {
+      handleSelectMedia({
+        id: 'exp-cake-1',
+        name: 'Virtual Birthday Cake Party (Interactive)',
+        type: 'interactive',
+        category: 'Interactive',
+        subType: 'cake',
+        thumbnail: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80'
+      });
+    } else {
+      handleSelectMedia({
+        id: 'exp-cyber-1',
+        name: 'Cyber Wave Matrix (Interactive)',
+        type: 'interactive',
+        category: 'Interactive',
+        subType: 'cyber',
+        thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80'
+      });
+    }
+  };
+
+  const handleUpdateCustomText = (text) => {
+    triggerInteractive('CUSTOM_TEXT', { text });
+  };
+
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '60px' }}>
-      {/* ── Top Header Navigation ────────────────────────────────────────── */}
-      <header style={{
-        background: 'var(--nm-surface)',
-        borderBottom: 'var(--border-card)',
-        boxShadow: 'var(--shadow-md)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        padding: '12px 24px'
-      }}>
-        <div style={{
-          maxWidth: '1440px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
-        }}>
-          {/* Brand & Session Code */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <div
-              onClick={() => onNavigate('home')}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-            >
-              <div className="nm-icon-box" style={{ width: '38px', height: '38px', color: 'var(--accent-cyan)', background: 'var(--nm-surface-light)' }}>
-                <Smartphone size={20} />
-              </div>
-              <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--text-heading)' }}>
-                Multi<span style={{ color: 'var(--accent-primary)' }}>Screen</span>
-              </span>
-            </div>
+      {/* ── Compact Mobile Console Header ───────────────────────────────── */}
+      <SessionControlPanel
+        sessionId={sessionId}
+        connectedCount={connectedCount}
+        totalSlots={totalSlots}
+        pendingCount={pendingDevices.length}
+        isMasterInGrid={isMasterInGrid}
+        blackout={blackout}
+        onOpenDisplayMode={handleOpenMasterDisplay}
+        onJoinGrid={() => handleMasterJoinGrid(0)}
+        onPairPhones={() => setIsQrOpen(true)}
+        onToggleBlackout={handleToggleBlackout}
+        onEndSession={() => setIsEndSessionOpen(true)}
+        onApproveAllPending={handleApproveAll}
+      />
 
-            <div style={{
-              background: 'var(--nm-surface-light)',
-              border: 'var(--border-subtle)',
-              borderRadius: 'var(--radius-full)',
-              padding: '5px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Session</span>
-              <span style={{ fontWeight: 800, color: 'var(--accent-cyan)', letterSpacing: '1px', fontSize: '0.9rem', fontFamily: 'var(--font-mono)' }}>
-                {sessionId}
-              </span>
-            </div>
-
-            <span className="badge badge-ready">
-              CONNECTED: {connectedCount} / {totalSlots}
-            </span>
-
-            {pendingDevices.length > 0 && (
-              <span className="badge badge-pending">
-                {pendingDevices.length} Pending
-              </span>
-            )}
-          </div>
-
-          {/* Quick Global Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            {isMasterInGrid ? (
-              <button
-                onClick={handleOpenMasterDisplay}
-                className="btn-primary"
-                style={{
-                  padding: '8px 14px',
-                  fontSize: '0.85rem',
-                  background: 'var(--clay-lavender)',
-                  color: '#271E47',
-                  boxShadow: 'var(--clay-shadow-lavender)'
-                }}
-              >
-                <Maximize2 size={15} /> Open Display Mode
-              </button>
-            ) : (
-              <button
-                onClick={() => handleMasterJoinGrid(0)}
-                className="btn-secondary"
-                style={{ padding: '8px 14px', fontSize: '0.85rem' }}
-                title="Use this master phone as one of the physical screens in the grid"
-              >
-                <Smartphone size={15} color="var(--clay-coral)" /> Join Grid
-              </button>
-            )}
-
-            <button
-              onClick={handleToggleBlackout}
-              className="btn-secondary"
-              style={{
-                padding: '8px 14px',
-                fontSize: '0.82rem',
-                background: blackout ? '#000' : undefined,
-                color: blackout ? 'var(--accent-rose)' : undefined,
-                border: blackout ? '1px solid var(--accent-rose)' : undefined
-              }}
-            >
-              {blackout ? 'Exit Blackout' : 'Blackout Screens'}
-            </button>
-
-            <button
-              onClick={handleBroadcastFullscreen}
-              className="btn-secondary"
-              style={{ padding: '8px 14px', fontSize: '0.82rem' }}
-            >
-              <Maximize2 size={15} /> Enter Display Mode All
-            </button>
-
-            <button
-              onClick={() => setIsQrOpen(true)}
-              className="btn-primary"
-              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-            >
-              <QrCode size={15} /> Pair Phones (QR)
-            </button>
-
-            <button
-              onClick={() => setIsEndSessionOpen(true)}
-              className="btn-danger"
-              style={{ padding: '8px 14px', fontSize: '0.85rem' }}
-            >
-              <Power size={15} /> End
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ── Pending Device Approval Banner (Requirement 14) ──────────────── */}
+      {/* ── Pending Device Approval Alert Banner ────────────────────────── */}
       {pendingDevices.length > 0 && (
         <div style={{
           background: 'rgba(245, 158, 11, 0.12)',
@@ -431,154 +388,9 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
       )}
 
       {/* ── Main Dashboard Body ──────────────────────────────────────────── */}
-      <main style={{ maxWidth: '1440px', margin: '24px auto', padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <main style={{ maxWidth: '1440px', margin: '20px auto', padding: '0 16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
-        {/* Master Phone Grid Banner (Requirement 1, 2, 3) */}
-        {isMasterInGrid ? (
-          <div
-            className="clay-card clay-card-mint animate-fade-in"
-            style={{
-              padding: '18px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '14px'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '14px',
-                background: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#144026',
-                boxShadow: 'var(--shadow-sm)'
-              }}>
-                <Check size={24} strokeWidth={2.8} />
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 900, fontSize: '1.2rem', color: '#144026' }}>
-                    {masterDisplayDevice?.deviceCode || 'P01'} ● MASTER DISPLAY
-                  </span>
-                  <span className="badge badge-ready" style={{ background: '#FFFFFF', color: '#166534', padding: '3px 12px' }}>
-                    ✓ IN GRID
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.88rem', color: '#195431', marginTop: '2px', fontWeight: 600 }}>
-                  Position: {masterDisplayDevice?.position?.label || 'Slot 1'} • Active in synchronized playback & cake countdown
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              {/* Slot Selector */}
-              <select
-                value={masterDisplayDevice?.position?.index ?? 0}
-                onChange={(e) => handleUpdatePosition(masterDisplayDevice.id, parseInt(e.target.value, 10))}
-                style={{
-                  padding: '9px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: '#FFFFFF',
-                  border: '2px solid rgba(20, 64, 38, 0.2)',
-                  color: '#144026',
-                  fontWeight: 800,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {Array.from({ length: totalSlots }).map((_, sIdx) => (
-                  <option key={sIdx} value={sIdx}>
-                    Move to Slot P{String(sIdx + 1).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                onClick={handleOpenMasterDisplay}
-                className="btn-primary"
-                style={{
-                  background: '#144026',
-                  color: '#FFFFFF',
-                  padding: '10px 18px',
-                  borderRadius: 'var(--radius-md)',
-                  boxShadow: '0 6px 14px -2px rgba(20, 64, 38, 0.4)'
-                }}
-              >
-                <Maximize2 size={16} /> ENTER DISPLAY MODE
-              </button>
-
-              <button
-                onClick={handleMasterLeaveGrid}
-                className="btn-secondary"
-                style={{
-                  padding: '10px 16px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.88rem'
-                }}
-                title="Remove Master from display grid while keeping controller and session alive"
-              >
-                <X size={16} /> LEAVE GRID
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="clay-card clay-card-lavender animate-fade-in"
-            style={{
-              padding: '18px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '14px'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '14px',
-                background: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#271E47',
-                boxShadow: 'var(--shadow-sm)'
-              }}>
-                <Smartphone size={22} strokeWidth={2.4} />
-              </div>
-              <div>
-                <div style={{ fontWeight: 900, fontSize: '1.15rem', color: '#271E47' }}>
-                  Use This Master Phone as a Screen in the Grid
-                </div>
-                <div style={{ fontSize: '0.88rem', color: '#3A2E63', marginTop: '2px' }}>
-                  Participate as physical screen P01 in synchronized videos, photos, and cake timers while retaining full controller access.
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => handleMasterJoinGrid(0)}
-              className="btn-primary"
-              style={{
-                background: '#271E47',
-                color: '#FFFFFF',
-                padding: '12px 24px',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: '0 8px 18px -4px rgba(39, 30, 71, 0.45)'
-              }}
-            >
-              <Smartphone size={18} /> JOIN GRID
-            </button>
-          </div>
-        )}
-
-        {/* Row 1: Live Simulator Wall (Centerpiece Showcase, Scalable 1-100) */}
+        {/* SECTION 1: Connected Devices / Live Grid Wall (Moved Upward) */}
         <MultiScreenSimulator
           layout={currentLayout}
           devices={devices}
@@ -597,9 +409,39 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           }}
         />
 
-        {/* Row 2: Playback Controls & Synchronized Timer Row */}
+        {/* SECTION 2: 5 Animation Modes Selector */}
+        <AnimationModeSelector
+          activeMode={activeMode}
+          onSelectMode={handleSelectMode}
+        />
+
+        {/* SECTION 3: User-Controlled Animated Text Area */}
+        <CustomMessageInput
+          currentText={interactiveState?.customText || 'MULTISCREEN CYBER MATRIX'}
+          onUpdateText={handleUpdateCustomText}
+        />
+
+        {/* SECTION 4: Mode-Specific Controls */}
+        {activeMode === 'cake' ? (
+          /* Strictly conditional Cake Party controls */
+          <CakePartyControls
+            onTriggerInteractive={triggerInteractive}
+            timerRemaining={timerRemaining}
+            timerActive={timerActive}
+            onStartTimer={handleStartTimer}
+            onPauseTimer={handlePauseTimer}
+            onResetTimer={handleResetTimer}
+          />
+        ) : (
+          /* Default Cyber Wave Matrix Controls */
+          <CyberWaveControls
+            interactiveState={interactiveState}
+            onTriggerInteractive={triggerInteractive}
+          />
+        )}
+
+        {/* SECTION 5: Media Playback & Controls Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-          {/* Media Playback Controls */}
           <div style={{ flex: '2 1 400px' }}>
             <PlaybackControls
               isPlaying={isPlaying}
@@ -620,7 +462,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
             />
           </div>
 
-          {/* Synchronized Countdown Timer Widget (Requirement 9) */}
+          {/* Synchronized Timer Widget */}
           <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -653,7 +495,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
                       padding: '8px',
                       fontSize: '0.8rem',
                       fontWeight: 700,
-                      background: timerDuration === sec ? 'rgba(99, 102, 241, 0.2)' : undefined,
+                      background: timerDuration === sec ? 'rgba(37, 99, 235, 0.2)' : undefined,
                       borderColor: timerDuration === sec ? 'var(--accent-primary)' : undefined
                     }}
                   >
@@ -663,7 +505,6 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
               </div>
             </div>
 
-            {/* Timer Actions */}
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={() => handleStartTimer(timerDuration)}
@@ -692,84 +533,8 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           </div>
         </div>
 
-        {/* Row 3: Independent JOIN / EXIT Media Controls (Requirement 6) */}
-        <div className="glass-panel" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-            <div>
-              <h4 style={{ fontSize: '1rem', color: 'var(--text-heading)' }}>Join & Exit Screen Transitions</h4>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Independent visuals displayed when a phone enters or leaves the grid wall
-              </p>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            {/* Join Media */}
-            <div style={{
-              background: 'var(--nm-surface-light)',
-              border: 'var(--border-subtle)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img
-                  src={session?.joinMedia?.thumbnail || session?.joinMedia?.url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=100'}
-                  alt="Join Media"
-                  style={{ width: '48px', height: '36px', objectFit: 'cover', borderRadius: '6px' }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase' }}>JOIN MEDIA</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-heading)' }}>{session?.joinMedia?.name || 'Welcome Flash'}</div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setMediaPickerType('join')}
-                className="btn-secondary"
-                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-              >
-                Select Join Media
-              </button>
-            </div>
-
-            {/* Exit Media */}
-            <div style={{
-              background: 'var(--nm-surface-light)',
-              border: 'var(--border-subtle)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img
-                  src={session?.exitMedia?.thumbnail || session?.exitMedia?.url || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=100'}
-                  alt="Exit Media"
-                  style={{ width: '48px', height: '36px', objectFit: 'cover', borderRadius: '6px' }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-pink)', textTransform: 'uppercase' }}>EXIT MEDIA</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-heading)' }}>{session?.exitMedia?.name || 'Farewell Pulse'}</div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setMediaPickerType('exit')}
-                className="btn-secondary"
-                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-              >
-                Select Exit Media
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Row 4: Grid Layout Configuration (1-100 phones) & Device Management */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '24px' }}>
+        {/* SECTION 6: Grid Layout Configuration (1-100 phones) & Device Management */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
           <LayoutSelector
             currentLayout={currentLayout}
             onSelectLayout={handleSelectLayout}
@@ -790,14 +555,14 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           />
         </div>
 
-        {/* Row 5: Media Library (Superheroes, Pop Culture, Celebration, Space, etc.) */}
+        {/* SECTION 7: Media Library */}
         <MediaLibrary
           currentMedia={currentMedia}
           onSelectMedia={handleSelectMedia}
           sessionId={sessionId}
         />
 
-        {/* Row 6: Bezel & Gap Adjustments */}
+        {/* SECTION 8: Bezel & Gap Adjustments */}
         <BezelSettings
           bezel={currentBezel}
           onUpdateBezel={handleUpdateBezel}
@@ -812,37 +577,6 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
         connectedCount={devices.length}
         serverInfo={serverInfo}
       />
-
-      {/* Join/Exit Media Picker Overlay Modal */}
-      {mediaPickerType && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0,0,0,0.85)',
-          backdropFilter: 'blur(8px)',
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px'
-        }}>
-          <div style={{ maxWidth: '960px', width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ color: '#fff' }}>
-                Select {mediaPickerType === 'join' ? 'JOIN MEDIA (Entrance)' : 'EXIT MEDIA (Departure)'}
-              </h3>
-              <button onClick={() => setMediaPickerType(null)} className="nm-btn-circle" style={{ width: '36px', height: '36px' }}>
-                <X size={18} />
-              </button>
-            </div>
-            <MediaLibrary
-              currentMedia={mediaPickerType === 'join' ? session?.joinMedia : session?.exitMedia}
-              onSelectMedia={handleSelectMedia}
-              sessionId={sessionId}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Session Termination Confirmation Modal */}
       {isEndSessionOpen && (
@@ -867,13 +601,13 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
               width: '64px',
               height: '64px',
               borderRadius: '50%',
-              background: 'rgba(244, 63, 94, 0.15)',
-              border: '1px solid rgba(244, 63, 94, 0.3)',
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 18px',
-              color: 'var(--accent-rose)'
+              color: '#ef4444'
             }}>
               <Power size={32} />
             </div>

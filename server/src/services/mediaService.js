@@ -310,10 +310,26 @@ export const PRESET_MEDIA = [
   }
 ];
 
+import { galleryDB } from './galleryService.js';
+
 let userUploadedMedia = [];
 
 export const getMediaList = () => {
-  return [...PRESET_MEDIA, ...userUploadedMedia];
+  let adminMedia = [];
+  try {
+    adminMedia = galleryDB.getImages({ isPublic: true }).map(img => ({
+      id: img.id,
+      name: img.title,
+      type: 'image',
+      category: img.categoryName || 'Admin Gallery',
+      url: img.imageUrl,
+      thumbnail: img.thumbnailUrl || img.imageUrl,
+      description: img.description
+    }));
+  } catch (e) {
+    console.warn('Could not load gallery images for media library', e);
+  }
+  return [...PRESET_MEDIA, ...adminMedia, ...userUploadedMedia];
 };
 
 export const addUploadedMedia = (mediaItem) => {
