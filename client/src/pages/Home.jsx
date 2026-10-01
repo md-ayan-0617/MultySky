@@ -15,22 +15,22 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
     <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '36px 20px 80px' }}>
       {/* Hero Section */}
       <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+        {/* Neumorphic pill badge */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: '10px',
           background: 'var(--nm-surface)',
           boxShadow: 'var(--nm-raised-sm)',
-          border: 'var(--border-card)',
-          padding: '8px 22px',
+          padding: '10px 24px',
           borderRadius: 'var(--radius-full)',
           fontSize: '0.85rem',
           color: 'var(--accent-cyan)',
-          marginBottom: '24px',
+          marginBottom: '28px',
           fontWeight: 600,
           letterSpacing: '0.02em'
         }}>
-          <Sparkles size={16} color="var(--accent-cyan)" /> Web-Based Multi-Device Display Platform
+          <Sparkles size={16} /> Web-Based Multi-Device Display Platform
         </div>
 
         <h1 style={{
@@ -48,7 +48,7 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
           fontSize: 'clamp(1rem, 2vw, 1.25rem)',
           color: 'var(--text-muted)',
           maxWidth: '700px',
-          margin: '0 auto 40px',
+          margin: '0 auto 44px',
           lineHeight: 1.65
         }}>
           Place smartphones side-by-side, pair via QR code, and watch synchronized 4K videos, 
@@ -56,7 +56,7 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
         </p>
 
         {/* Neumorphic Primary Action Buttons */}
-        <div style={{ display: 'flex', gap: '18px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '44px' }}>
+        <div style={{ display: 'flex', gap: '18px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '48px' }}>
           <button
             onClick={() => onNavigate('create')}
             className="btn-primary"
@@ -79,9 +79,7 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             style={{
               padding: '16px 28px',
               fontSize: '1.08rem',
-              borderColor: 'var(--btn-danger-border)',
-              color: 'var(--accent-pink)',
-              boxShadow: '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 14px var(--btn-danger-glow)'
+              boxShadow: 'var(--nm-raised), var(--accent-glow-pink)'
             }}
           >
             🎂 Demo: Virtual Cake Party
@@ -93,9 +91,7 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
             style={{
               padding: '16px 28px',
               fontSize: '1.08rem',
-              borderColor: 'rgba(2, 132, 199, 0.35)',
-              color: 'var(--accent-cyan)',
-              boxShadow: '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 14px var(--btn-primary-glow)'
+              boxShadow: 'var(--nm-raised), var(--accent-glow-cyan)'
             }}
           >
             ⚡ Demo: Cyber Wave Matrix
@@ -144,69 +140,40 @@ export default function Home({ onNavigate, onQuickStartCake, onQuickStartCyber }
         </form>
       </div>
 
-      {/* Feature Showcase Grid - Neumorphic Cards */}
+      {/* Feature Showcase Grid — Neumorphic raised cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
-        gap: '24px',
+        gap: '28px',
         marginBottom: '64px'
       }}>
-        {/* Card 1 */}
-        <div className="nm-card" style={{ padding: '32px 26px' }}>
-          <div className="nm-icon-box" style={{ marginBottom: '20px', color: 'var(--accent-cyan)' }}>
-            <QrCode size={24} />
+        {[
+          { icon: <QrCode size={24} />, color: 'var(--accent-cyan)', title: 'Instant QR Code Pairing',
+            desc: 'Zero apps or setup required. Friends simply point their smartphone camera at the master screen to join the synchronized wall in seconds.' },
+          { icon: <Layers size={24} />, color: 'var(--accent-primary)', title: 'Automatic Region Splitting',
+            desc: 'Hardware-accelerated HTML5 Canvas cropping engine divides high-res media dynamically for 1×2, 2×2, 2×3, or 3×3 grids with bezel compensation.' },
+          { icon: <Sparkles size={24} />, color: 'var(--accent-pink)', title: 'Interactive Cake Experience',
+            desc: 'Assemble phones for celebrations. Swipe a virtual knife across multiple phone screens to slice the cake with realistic physics, candle blowing, and confetti!' },
+          { icon: <Zap size={24} />, color: 'var(--accent-cyan)', title: 'Cyber Wave Matrix',
+            desc: 'Mesmerizing neon pulse waves scroll seamlessly across every screen. Tap any phone to send a synchronized ripple burst, toggle colors, speed, and glitch FX live!' }
+        ].map((card, i) => (
+          <div key={i} className="nm-card" style={{ padding: '32px 26px' }}>
+            <div className="nm-icon-box" style={{ marginBottom: '20px', color: card.color }}>
+              {card.icon}
+            </div>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-heading)', marginBottom: '10px', fontWeight: 700 }}>
+              {card.title}
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+              {card.desc}
+            </p>
           </div>
-          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-heading)', marginBottom: '10px', fontWeight: 700 }}>
-            Instant QR Code Pairing
-          </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-            Zero apps or setup required. Friends simply point their smartphone camera at the master screen to join the synchronized wall in seconds.
-          </p>
-        </div>
-
-        {/* Card 2 */}
-        <div className="nm-card" style={{ padding: '32px 26px' }}>
-          <div className="nm-icon-box" style={{ marginBottom: '20px', color: 'var(--accent-primary)' }}>
-            <Layers size={24} />
-          </div>
-          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-heading)', marginBottom: '10px', fontWeight: 700 }}>
-            Automatic Region Splitting
-          </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-            Hardware-accelerated HTML5 Canvas cropping engine divides high-res media dynamically for 1×2, 2×2, 2×3, or 3×3 grids with bezel compensation.
-          </p>
-        </div>
-
-        {/* Card 3 */}
-        <div className="nm-card" style={{ padding: '32px 26px' }}>
-          <div className="nm-icon-box" style={{ marginBottom: '20px', color: 'var(--accent-pink)' }}>
-            <Sparkles size={24} />
-          </div>
-          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-heading)', marginBottom: '10px', fontWeight: 700 }}>
-            Interactive Cake Experience
-          </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-            Assemble phones for celebrations. Swipe a virtual knife across multiple phone screens to slice the cake with realistic physics, candle blowing, and confetti!
-          </p>
-        </div>
-
-        {/* Card 4 — Cyber Wave */}
-        <div className="nm-card" style={{ padding: '32px 26px' }}>
-          <div className="nm-icon-box" style={{ marginBottom: '20px', color: 'var(--accent-cyan)' }}>
-            <Zap size={24} />
-          </div>
-          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-heading)', marginBottom: '10px', fontWeight: 700 }}>
-            Cyber Wave Matrix
-          </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-            Mesmerizing neon pulse waves scroll seamlessly across every screen. Tap any phone to send a synchronized ripple burst, toggle colors, speed, and glitch FX live!
-          </p>
-        </div>
+        ))}
       </div>
 
-      {/* Social Trend Banner */}
+      {/* Social Trend Banner — large neumorphic card */}
       <div className="nm-card" style={{
-        padding: '42px 30px',
+        padding: '48px 30px',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden'

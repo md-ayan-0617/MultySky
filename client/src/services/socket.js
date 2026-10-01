@@ -30,12 +30,12 @@ export function getSocket() {
         if (port === '3001') {
           socketUrl = origin;
         } else if (port === '5173' || isPrivateIp) {
-          socketUrl = `http://${hostname}:3001`;
+          socketUrl = `https://multysky.onrender.com`;
         } else {
           socketUrl = origin;
         }
       } else {
-        socketUrl = 'http://localhost:3001';
+        socketUrl = 'https://multysky.onrender.com';
       }
     }
 

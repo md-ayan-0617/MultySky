@@ -1,4 +1,7 @@
-/* ── Neumorphic Component Styles & Micro-interactions ── */
+/* ═══════════════════════════════════════════════════════════════════════
+   Neumorphic Component Styles — neumorphism.io approach
+   No borders, pure shadow-based depth
+   ═══════════════════════════════════════════════════════════════════════ */
 
 .app-container {
   min-height: 100vh;
@@ -6,40 +9,34 @@
   background-color: var(--nm-bg);
 }
 
-/* Neumorphic phone simulator frame */
+/* ── Neumorphic phone simulator frame ── */
 .nm-phone-shell {
-  background: var(--btn-secondary-bg);
-  box-shadow: 6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow);
-  border: var(--border-card);
-  border-radius: 18px;
+  background: var(--nm-surface);
+  box-shadow: var(--nm-raised);
+  border: none;
+  border-radius: 20px;
   padding: 10px;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nm-phone-shell:hover {
-  transform: translateY(-2px);
-  box-shadow: 8px 8px 22px var(--nm-dark-shadow), -8px -8px 22px var(--nm-light-shadow);
+  transform: translateY(-3px);
+  box-shadow: var(--nm-raised-lg);
 }
 
 .nm-phone-shell.active-slot {
-  border-color: var(--accent-cyan);
-  box-shadow: 6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 16px rgba(0, 229, 255, 0.35);
+  box-shadow: var(--nm-raised), var(--accent-glow-cyan);
 }
 
-[data-theme="light"] .nm-phone-shell.active-slot {
-  border-color: var(--accent-primary);
-  box-shadow: 6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 16px rgba(79, 70, 229, 0.3);
-}
-
-/* Neumorphic tactile circular button */
+/* ── Neumorphic tactile circular button ── */
 .nm-btn-circle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background: var(--icon-box-bg);
-  box-shadow: 4px 4px 10px var(--nm-dark-shadow), -4px -4px 10px var(--nm-light-shadow);
-  border: var(--icon-box-border);
+  box-shadow: var(--nm-raised-sm);
+  border: none;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -50,7 +47,7 @@
 
 .nm-btn-circle:hover {
   transform: scale(1.08);
-  box-shadow: 6px 6px 14px var(--nm-dark-shadow), -6px -6px 14px var(--nm-light-shadow);
+  box-shadow: var(--nm-raised);
   color: var(--accent-cyan);
 }
 
@@ -59,27 +56,14 @@
   transform: scale(0.95);
 }
 
-/* Neumorphic selected item glow */
+/* ── Neumorphic selected item (accent glow ring) ── */
 .nm-selected {
-  background: var(--nm-surface-light) !important;
-  border: 2px solid var(--accent-cyan) !important;
-  box-shadow: 6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 20px rgba(0, 229, 255, 0.35) !important;
+  box-shadow: var(--nm-raised), var(--accent-glow-cyan) !important;
 }
 
-[data-theme="light"] .nm-selected {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 20px rgba(79, 70, 229, 0.3) !important;
-}
-
-/* Neumorphic active tab */
+/* ── Neumorphic active tab (pressed in) ── */
 .nm-tab-active {
-  background: var(--nm-surface-dark) !important;
+  background: var(--nm-surface) !important;
   box-shadow: var(--nm-pressed) !important;
-  color: var(--accent-cyan) !important;
-  border-color: rgba(0, 229, 255, 0.4) !important;
-}
-
-[data-theme="light"] .nm-tab-active {
   color: var(--accent-primary) !important;
-  border-color: rgba(79, 70, 229, 0.4) !important;
 }
