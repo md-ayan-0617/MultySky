@@ -40,36 +40,23 @@ export default function CreateSession({ onNavigate, onCreated }) {
   };
 
   return (
-    <div style={{ maxWidth: '840px', margin: '40px auto', padding: '0 20px' }}>
+    <div className="create-session-container">
       <button
         onClick={() => onNavigate('home')}
-        className="btn-secondary"
-        style={{ marginBottom: '24px', padding: '8px 16px', fontSize: '0.85rem' }}
+        className="btn-secondary back-nav-btn"
       >
         <ArrowLeft size={16} /> Back to Home
       </button>
 
-      <div className="clay-card" style={{ padding: '36px 28px', background: 'var(--clay-surface)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'var(--clay-surface-warm)',
-            border: '2px solid rgba(48, 45, 61, 0.05)',
-            padding: '6px 16px',
-            borderRadius: 'var(--radius-full)',
-            fontSize: '0.85rem',
-            fontWeight: 800,
-            color: 'var(--clay-coral)',
-            marginBottom: '12px'
-          }}>
+      <div className="clay-card create-session-card">
+        <div className="create-session-header">
+          <div className="create-badge">
             <Sparkles size={16} /> Session Setup & Grid Configuration
           </div>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-heading)', marginBottom: '8px' }}>
+          <h2 className="create-title">
             Create MultiScreen Session
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          <p className="create-subtitle">
             Configure 1 to 100 smartphones in an intelligent multi-screen video wall.
           </p>
         </div>
@@ -89,7 +76,7 @@ export default function CreateSession({ onNavigate, onCreated }) {
         )}
 
         {/* Layout Selector (Standard + More Grids 10-100 + Custom) */}
-        <div style={{ marginBottom: '28px' }}>
+        <div style={{ marginBottom: '24px' }}>
           <LayoutSelector
             currentLayout={selectedLayout}
             onSelectLayout={(layout) => setSelectedLayout(layout)}
@@ -101,17 +88,17 @@ export default function CreateSession({ onNavigate, onCreated }) {
           background: 'var(--nm-surface-light)',
           border: 'var(--border-subtle)',
           borderRadius: 'var(--radius-md)',
-          padding: '20px',
-          marginBottom: '28px',
+          padding: '16px',
+          marginBottom: '24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '16px'
+          gap: '14px'
         }}>
           <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-heading)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Session Security & Device Control
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             {/* PIN Protection */}
             <div style={{
               background: 'var(--nm-surface)',
@@ -172,12 +159,11 @@ export default function CreateSession({ onNavigate, onCreated }) {
         </div>
 
         {/* Action Button */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+        <div className="create-action-wrap">
           <button
             onClick={handleCreate}
             disabled={isCreating}
-            className="btn-primary"
-            style={{ padding: '14px 28px', fontSize: '1rem' }}
+            className="btn-primary create-launch-btn"
           >
             {isCreating ? 'Launching Session...' : `Launch Session (${selectedLayout.rows}×${selectedLayout.cols})`}
             <ArrowRight size={18} />

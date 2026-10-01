@@ -33,175 +33,96 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
   };
 
   return (
-    <div className="clay-card" style={{ padding: '24px', background: 'var(--clay-surface)' }}>
+    <div className="clay-card layout-selector-card">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '12px',
-            color: '#271E47',
-            background: 'var(--clay-lavender)',
-            boxShadow: 'var(--clay-shadow-lavender)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Grid size={22} />
+      <div className="layout-selector-header">
+        <div className="layout-selector-title-group">
+          <div className="layout-selector-icon">
+            <Grid size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-heading)' }}>Screen Grid Configuration</h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+            <h3 className="layout-selector-heading">Screen Grid Configuration</h3>
+            <p className="layout-selector-subtext">
               Configure 1 to 100 smartphone screens in a synchronized visual wall
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="badge badge-ready" style={{ fontSize: '0.82rem', padding: '6px 14px' }}>
+        <div className="layout-selector-badge-wrap">
+          <span className="badge badge-ready layout-active-badge">
             Active: {currentLayout?.rows || 2} × {currentLayout?.cols || 2} ({currentLayout?.total || 4} Phones)
           </span>
         </div>
       </div>
 
       {/* Tabs: Standard vs More Grids (10-100) vs Custom */}
-      <div style={{
-        display: 'flex',
-        gap: '6px',
-        padding: '6px',
-        background: 'var(--clay-surface-warm)',
-        borderRadius: 'var(--radius-md)',
-        marginBottom: '20px',
-        border: '2px solid rgba(48, 45, 61, 0.05)'
-      }}>
+      <div className="grid-segmented-tabs" role="tablist">
         <button
+          role="tab"
+          aria-selected={activeTab === 'standard'}
           onClick={() => setActiveTab('standard')}
-          style={{
-            flex: 1,
-            padding: '10px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.9rem',
-            fontWeight: 800,
-            background: activeTab === 'standard' ? 'var(--clay-coral)' : 'transparent',
-            color: activeTab === 'standard' ? '#ffffff' : 'var(--text-secondary)',
-            boxShadow: activeTab === 'standard' ? 'var(--clay-shadow-coral)' : 'none',
-            transition: 'all 0.2s ease'
-          }}
+          className={`grid-tab-btn ${activeTab === 'standard' ? 'active' : ''}`}
         >
-          Standard (1–9)
+          <span className="tab-full">Standard (1–9)</span>
+          <span className="tab-short">Standard</span>
         </button>
 
         <button
+          role="tab"
+          aria-selected={activeTab === 'more'}
           onClick={() => setActiveTab('more')}
-          style={{
-            flex: 1,
-            padding: '10px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.9rem',
-            fontWeight: 800,
-            background: activeTab === 'more' ? 'var(--clay-coral)' : 'transparent',
-            color: activeTab === 'more' ? '#ffffff' : 'var(--text-secondary)',
-            boxShadow: activeTab === 'more' ? 'var(--clay-shadow-coral)' : 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            transition: 'all 0.2s ease'
-          }}
+          className={`grid-tab-btn ${activeTab === 'more' ? 'active' : ''}`}
         >
-          <Layers size={16} /> MORE GRIDS (10–100)
+          <Layers size={14} className="tab-icon" />
+          <span className="tab-full">More Grids (10–100)</span>
+          <span className="tab-short">10–100</span>
         </button>
 
         <button
+          role="tab"
+          aria-selected={activeTab === 'custom'}
           onClick={() => setActiveTab('custom')}
-          style={{
-            flex: 1,
-            padding: '10px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.9rem',
-            fontWeight: 800,
-            background: activeTab === 'custom' ? 'var(--clay-coral)' : 'transparent',
-            color: activeTab === 'custom' ? '#ffffff' : 'var(--text-secondary)',
-            boxShadow: activeTab === 'custom' ? 'var(--clay-shadow-coral)' : 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            transition: 'all 0.2s ease'
-          }}
+          className={`grid-tab-btn ${activeTab === 'custom' ? 'active' : ''}`}
         >
-          <Sliders size={16} /> Custom Grid
+          <Sliders size={14} className="tab-icon" />
+          <span className="tab-full">Custom Grid</span>
+          <span className="tab-short">Custom</span>
         </button>
       </div>
 
       {/* ── 1. STANDARD LAYOUTS ────────────────────────────────────────────── */}
       {activeTab === 'standard' && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))',
-          gap: '12px'
-        }}>
+        <div className="grid-cards-grid">
           {STANDARD_LAYOUTS.map((item) => {
             const isSelected = activeId === item.id;
             return (
               <div
                 key={item.id}
                 onClick={() => onSelectLayout(item)}
-                style={{
-                  background: 'var(--clay-surface)',
-                  border: isSelected ? '2px solid var(--clay-coral)' : '2px solid rgba(48, 45, 61, 0.06)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '16px 12px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: isSelected ? 'var(--clay-shadow-coral)' : 'var(--shadow-sm)',
-                  transform: isSelected ? 'translateY(-2px)' : 'none'
-                }}
+                className={`grid-card-item ${isSelected ? 'selected' : ''}`}
               >
                 {/* Visual Mini Layout Grid */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateRows: `repeat(${item.rows}, 1fr)`,
-                  gridTemplateColumns: `repeat(${item.cols}, 1fr)`,
-                  gap: '3px',
-                  width: '56px',
-                  height: '42px',
-                  background: 'var(--clay-surface-warm)',
-                  padding: '4px',
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                  border: '1.5px solid rgba(48, 45, 61, 0.05)'
-                }}>
-                  {Array.from({ length: item.rows * item.cols }).map((_, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        background: isSelected ? 'var(--clay-coral)' : 'var(--text-muted)',
-                        borderRadius: '3px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '0.65rem',
-                        fontWeight: 800,
-                        color: '#fff',
-                        opacity: isSelected ? 1 : 0.4
-                      }}
-                    >
-                      {idx + 1}
-                    </div>
-                  ))}
+                <div className="grid-card-preview">
+                  <div
+                    className="grid-card-cells"
+                    style={{
+                      gridTemplateRows: `repeat(${item.rows}, 1fr)`,
+                      gridTemplateColumns: `repeat(${item.cols}, 1fr)`
+                    }}
+                  >
+                    {Array.from({ length: item.rows * item.cols }).map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`grid-card-cell ${isSelected ? 'cell-selected' : ''}`}
+                      >
+                        {idx + 1}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: isSelected ? 'var(--clay-coral)' : 'var(--text-heading)' }}>
-                  {item.name}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', fontWeight: 600 }}>
-                  {item.desc}
-                </div>
+                <div className="grid-card-title">{item.name}</div>
+                <div className="grid-card-desc">{item.desc}</div>
               </div>
             );
           })}
@@ -375,7 +296,7 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
             Set custom rows and columns up to 100 total screens (e.g. 7×7, 8×10, 10×10).
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '14px', marginBottom: '20px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-label)', marginBottom: '6px' }}>
                 Rows (1 – 10)

@@ -39,6 +39,10 @@ body[data-theme='light'] {
   --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
+  /* Header Theme Background */
+  --header-bg: rgba(248, 245, 238, 0.94);
+  --header-border: 1px solid rgba(48, 45, 61, 0.08);
+
   /* Borders — Soft, barely visible warm borders */
   --border-subtle: 2px solid rgba(48, 45, 61, 0.05);
   --border-card: 2px solid rgba(255, 255, 255, 0.9);
@@ -138,6 +142,10 @@ body[data-theme='dark'] {
   --text-heading: #FFFFFF;
   --text-label: #D5CEE5;
 
+  /* Header Theme Background */
+  --header-bg: rgba(26, 24, 36, 0.94);
+  --header-border: 1px solid rgba(255, 255, 255, 0.08);
+
   --border-subtle: 2px solid rgba(255, 255, 255, 0.06);
   --border-card: 2px solid rgba(255, 255, 255, 0.08);
   --border-card-hover: 2px solid var(--clay-lavender);
@@ -170,6 +178,8 @@ body[data-theme='dark'] {
 
 html, body {
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   min-height: 100vh;
   background-color: var(--clay-bg);
   color: var(--text-primary);
