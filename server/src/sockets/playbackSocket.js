@@ -161,13 +161,5 @@ export const registerPlaybackHandlers = (io, socket) => {
     }
   });
 
-  // End session
-  socket.on('end-session', ({ sessionId }, callback) => {
-    const session = sessionService.getSession(sessionId);
-    if (session) {
-      session.status = 'ended';
-      io.to(`session:${sessionId}`).emit('session-ended', { sessionId });
-      if (callback) callback({ success: true });
-    }
-  });
 };
+

@@ -29,17 +29,17 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
     <div className="glass-panel" style={{ padding: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            background: 'rgba(245, 158, 11, 0.2)',
-            padding: '8px',
+          <div className="nm-icon-box" style={{
+            width: '36px',
+            height: '36px',
             borderRadius: '10px',
-            color: '#fbbf24',
+            color: 'var(--accent-amber)',
             display: 'flex'
           }}>
             <Sliders size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Bezel & Gap Compensation</h3>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)' }}>Bezel & Gap Compensation</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Compensate for physical smartphone edge borders for seamless imagery
             </p>
@@ -64,8 +64,8 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
         {/* Horizontal Gap */}
         <div className="glass-panel-subtle" style={{ padding: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1' }}>Horizontal Bezel Gap</span>
-            <span style={{ color: '#38bdf8', fontWeight: 600 }}>{gapX}%</span>
+            <span style={{ color: 'var(--text-label)' }}>Horizontal Bezel Gap</span>
+            <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{gapX}%</span>
           </div>
           <input
             type="range"
@@ -74,15 +74,15 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
             step="0.5"
             value={gapX}
             onChange={(e) => handleChange('gapX', parseFloat(e.target.value))}
-            style={{ width: '100%', accentColor: '#06b6d4', cursor: 'pointer' }}
+            style={{ width: '100%', cursor: 'pointer' }}
           />
         </div>
 
         {/* Vertical Gap */}
         <div className="glass-panel-subtle" style={{ padding: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1' }}>Vertical Bezel Gap</span>
-            <span style={{ color: '#38bdf8', fontWeight: 600 }}>{gapY}%</span>
+            <span style={{ color: 'var(--text-label)' }}>Vertical Bezel Gap</span>
+            <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{gapY}%</span>
           </div>
           <input
             type="range"
@@ -91,15 +91,15 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
             step="0.5"
             value={gapY}
             onChange={(e) => handleChange('gapY', parseFloat(e.target.value))}
-            style={{ width: '100%', accentColor: '#06b6d4', cursor: 'pointer' }}
+            style={{ width: '100%', cursor: 'pointer' }}
           />
         </div>
 
         {/* Scale / Zoom */}
         <div className="glass-panel-subtle" style={{ padding: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1' }}>Media Zoom / Scale</span>
-            <span style={{ color: '#a855f7', fontWeight: 600 }}>{scale}%</span>
+            <span style={{ color: 'var(--text-label)' }}>Media Zoom / Scale</span>
+            <span style={{ color: 'var(--accent-secondary)', fontWeight: 600 }}>{scale}%</span>
           </div>
           <input
             type="range"
@@ -108,15 +108,15 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
             step="1"
             value={scale}
             onChange={(e) => handleChange('scale', parseInt(e.target.value))}
-            style={{ width: '100%', accentColor: '#8b5cf6', cursor: 'pointer' }}
+            style={{ width: '100%', cursor: 'pointer' }}
           />
         </div>
 
         {/* Crop Offset Shift X */}
         <div className="glass-panel-subtle" style={{ padding: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1' }}>Horizontal Offset (X)</span>
-            <span style={{ color: '#10b981', fontWeight: 600 }}>{offsetX}px</span>
+            <span style={{ color: 'var(--text-label)' }}>Horizontal Offset (X)</span>
+            <span style={{ color: 'var(--accent-emerald)', fontWeight: 600 }}>{offsetX}px</span>
           </div>
           <input
             type="range"
@@ -125,15 +125,15 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
             step="1"
             value={offsetX}
             onChange={(e) => handleChange('offsetX', parseInt(e.target.value))}
-            style={{ width: '100%', accentColor: '#10b981', cursor: 'pointer' }}
+            style={{ width: '100%', cursor: 'pointer' }}
           />
         </div>
 
         {/* Crop Offset Shift Y */}
         <div className="glass-panel-subtle" style={{ padding: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1' }}>Vertical Offset (Y)</span>
-            <span style={{ color: '#10b981', fontWeight: 600 }}>{offsetY}px</span>
+            <span style={{ color: 'var(--text-label)' }}>Vertical Offset (Y)</span>
+            <span style={{ color: 'var(--accent-emerald)', fontWeight: 600 }}>{offsetY}px</span>
           </div>
           <input
             type="range"
@@ -142,7 +142,7 @@ export default function BezelSettings({ bezel = {}, onUpdateBezel }) {
             step="1"
             value={offsetY}
             onChange={(e) => handleChange('offsetY', parseInt(e.target.value))}
-            style={{ width: '100%', accentColor: '#10b981', cursor: 'pointer' }}
+            style={{ width: '100%', cursor: 'pointer' }}
           />
         </div>
       </div>

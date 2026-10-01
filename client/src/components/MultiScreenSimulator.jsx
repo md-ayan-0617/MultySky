@@ -12,7 +12,8 @@ export default function MultiScreenSimulator({
   isPlaying,
   currentTime,
   interactiveState,
-  onTriggerInteractive
+  onTriggerInteractive,
+  onLoadedMetadata
 }) {
   const rows = layout?.rows || 2;
   const cols = layout?.cols || 2;
@@ -22,58 +23,58 @@ export default function MultiScreenSimulator({
   const isInteractiveCyber = media?.type === 'interactive' && media?.subType === 'cyber';
 
   return (
-    <div className="glass-panel" style={{ padding: '24px', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.2)',
-            padding: '8px',
-            borderRadius: '10px',
-            color: '#34d399',
-            display: 'flex'
-          }}>
+    <div className="nm-card" style={{ padding: '26px', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="nm-icon-box" style={{ color: 'var(--accent-emerald)' }}>
             <Eye size={20} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Live Multi-Screen Wall Preview</h3>
-              <span className="badge badge-connected" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+              <h3 style={{ fontSize: '1.2rem', color: 'var(--text-heading)', fontWeight: 700 }}>Live Multi-Screen Wall Preview</h3>
+              <span className="badge badge-connected" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
                 <Radio size={12} className="anim-glow" /> Synchronized
               </span>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
               Real-time visualization of combined smartphone screens and bezel gaps
             </p>
           </div>
         </div>
 
-        <div style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: 600 }}>
+        <div style={{
+          background: 'var(--nm-surface-dark)',
+          boxShadow: 'var(--nm-inset-sm)',
+          border: 'var(--border-card)',
+          padding: '6px 14px',
+          borderRadius: 'var(--radius-full)',
+          fontSize: '0.85rem',
+          color: 'var(--accent-cyan)',
+          fontWeight: 700
+        }}>
           {layout?.name || '2 × 2'} Grid
         </div>
       </div>
 
-      {/* Outer Phone Wall Stage */}
-      <div style={{
-        background: '#040509',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '18px',
-        padding: '24px 16px',
+      {/* Outer Phone Wall Stage - Neumorphic Deep Inset Well */}
+      <div className="nm-well" style={{
+        padding: '28px 18px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '380px',
-        boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)'
+        minHeight: '400px',
+        boxShadow: 'inset 8px 8px 24px var(--nm-dark-shadow), inset -8px -8px 24px var(--nm-light-shadow)'
       }}>
         {/* Dynamic Grid of Smartphones */}
         <div style={{
           display: 'grid',
-          gridTemplateRows: `repeat(${rows}, minmax(130px, 170px))`,
-          gridTemplateColumns: `repeat(${cols}, minmax(170px, 230px))`,
-          gap: `${(bezel?.gapX || 3) * 3}px`,
+          gridTemplateRows: `repeat(${rows}, minmax(140px, 180px))`,
+          gridTemplateColumns: `repeat(${cols}, minmax(180px, 240px))`,
+          gap: `${Math.max(6, (bezel?.gapX || 3) * 3.5)}px`,
           justifyContent: 'center',
           alignItems: 'center',
           width: '100%',
-          maxWidth: '900px'
+          maxWidth: '920px'
         }}>
           {Array.from({ length: totalSlots }).map((_, slotIndex) => {
             const row = Math.floor(slotIndex / cols);
@@ -83,15 +84,11 @@ export default function MultiScreenSimulator({
             return (
               <div
                 key={slotIndex}
+                className={`nm-phone-shell ${pairedDevice ? 'active-slot' : ''}`}
                 style={{
                   position: 'relative',
                   width: '100%',
                   height: '100%',
-                  background: '#13151f',
-                  borderRadius: '16px',
-                  padding: '8px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.6), inset 0 0 0 2px #26293b',
-                  border: pairedDevice ? '2px solid #06b6d4' : '1px solid rgba(255,255,255,0.1)',
                   display: 'flex',
                   flexDirection: 'column',
                   overflow: 'hidden'
@@ -150,6 +147,7 @@ export default function MultiScreenSimulator({
                       bezel={bezel}
                       isPlaying={isPlaying}
                       currentTime={currentTime}
+                      onLoadedMetadata={slotIndex === 0 ? onLoadedMetadata : undefined}
                     />
                   )}
 

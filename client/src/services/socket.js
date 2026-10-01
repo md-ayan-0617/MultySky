@@ -18,12 +18,21 @@ export function getSocket() {
     let socketUrl = import.meta.env.VITE_BACKEND_URL;
     if (!socketUrl) {
       if (typeof window !== 'undefined') {
-        const host = window.location.hostname;
-        const isLocal = host === 'localhost' || host === '127.0.0.1' || /^192\.168\./.test(host) || /^10\./.test(host);
-        if (isLocal) {
-          socketUrl = `http://${host}:3001`;
+        const { hostname, port, protocol, origin } = window.location;
+        const isPrivateIp = 
+          hostname === 'localhost' || 
+          hostname === '127.0.0.1' || 
+          hostname.endsWith('.local') ||
+          /^192\.168\./.test(hostname) || 
+          /^10\./.test(hostname) ||
+          /^172\.(1[6-9]|2[0-9]|3[01])\./.test(hostname);
+
+        if (port === '3001') {
+          socketUrl = origin;
+        } else if (port === '5173' || isPrivateIp) {
+          socketUrl = `http://${hostname}:3001`;
         } else {
-          socketUrl = 'https://multysky.onrender.com';
+          socketUrl = origin;
         }
       } else {
         socketUrl = 'http://localhost:3001';

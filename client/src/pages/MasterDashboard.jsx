@@ -60,10 +60,17 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
   };
 
   const handleSelectMedia = (media) => {
+    if (media?.duration) setDuration(media.duration);
     if (socket) {
       socket.emit('change-media', { sessionId, media });
     }
   };
+
+  useEffect(() => {
+    if (session?.media?.duration) {
+      setDuration(session.media.duration);
+    }
+  }, [session?.media?.id, setDuration]);
 
   const handleUpdatePosition = (deviceId, newIndex) => {
     if (socket) {
@@ -119,9 +126,9 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
     <div style={{ minHeight: '100vh', paddingBottom: '60px' }}>
       {/* Top Navigation Bar */}
       <header style={{
-        background: 'rgba(15, 17, 26, 0.85)',
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--nm-surface)',
+        boxShadow: '0 8px 24px var(--nm-dark-shadow)',
+        borderBottom: 'var(--border-card)',
         position: 'sticky',
         top: 0,
         zIndex: 100,
@@ -142,35 +149,26 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
               onClick={() => onNavigate('home')}
               style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
             >
-              <div style={{
-                background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                boxShadow: '0 0 15px rgba(99, 102, 241, 0.5)'
-              }}>
+              <div className="nm-icon-box" style={{ width: '38px', height: '38px', borderRadius: '10px', color: 'var(--accent-cyan)' }}>
                 <Smartphone size={20} />
               </div>
-              <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: '#fff' }}>
-                Multi<span style={{ color: '#38bdf8' }}>Screen</span>
+              <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--text-heading)' }}>
+                Multi<span style={{ color: 'var(--accent-cyan)' }}>Screen</span>
               </span>
             </div>
 
             <div style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: 'var(--nm-surface-dark)',
+              boxShadow: 'var(--nm-inset-sm)',
+              border: 'var(--border-card)',
               borderRadius: 'var(--radius-full)',
-              padding: '4px 14px',
+              padding: '6px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
             }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Session</span>
-              <span style={{ fontWeight: 800, color: '#38bdf8', letterSpacing: '1px', fontSize: '0.9rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Session</span>
+              <span style={{ fontWeight: 800, color: 'var(--accent-cyan)', letterSpacing: '1px', fontSize: '0.92rem' }}>
                 {sessionId}
               </span>
             </div>
@@ -182,11 +180,11 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           </div>
 
           {/* Quick Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               onClick={() => setIsQrOpen(true)}
               className="btn-primary"
-              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+              style={{ padding: '9px 18px', fontSize: '0.88rem' }}
             >
               <QrCode size={16} /> Pair Devices (QR)
             </button>
@@ -194,7 +192,7 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
             <button
               onClick={() => setIsEndSessionOpen(true)}
               className="btn-danger"
-              style={{ padding: '8px 14px', fontSize: '0.85rem' }}
+              style={{ padding: '9px 16px', fontSize: '0.88rem' }}
             >
               <Power size={16} /> End
             </button>
@@ -215,6 +213,9 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           currentTime={currentTime}
           interactiveState={interactiveState}
           onTriggerInteractive={triggerInteractive}
+          onLoadedMetadata={(meta) => {
+            if (meta?.duration) setDuration(meta.duration);
+          }}
         />
 
         {/* Row 2: Playback Controls */}
@@ -288,51 +289,49 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
           zIndex: 2500,
           padding: '20px'
         }}>
-          <div style={{
-            maxWidth: '380px',
+          <div className="nm-card" style={{
+            maxWidth: '400px',
             width: '100%',
-            background: 'rgba(20, 24, 38, 0.95)',
-            border: '1px solid rgba(244, 63, 94, 0.4)',
-            borderRadius: '24px',
-            padding: '32px 24px',
+            padding: '36px 28px',
             textAlign: 'center',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 35px rgba(244, 63, 94, 0.25)',
-            animation: 'glowPulse 3s infinite'
+            boxShadow: 'var(--nm-raised-lg), 0 0 35px var(--btn-danger-hover-glow)',
+            border: '1px solid var(--btn-danger-border)',
+            borderRadius: 'var(--radius-xl)'
           }}>
-            {/* Glowing Red Power Icon (Matching PRD FR-15 mockup) */}
+            {/* Glowing Red Power Icon */}
             <div style={{
-              width: '72px',
-              height: '72px',
+              width: '76px',
+              height: '76px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, #f43f5e 0%, #be123c 100%)',
+              background: 'linear-gradient(145deg, var(--accent-rose), #be123c)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 20px',
+              margin: '0 auto 22px',
               color: '#fff',
-              boxShadow: '0 0 30px rgba(244, 63, 94, 0.6), inset 0 2px 4px rgba(255,255,255,0.4)'
+              boxShadow: '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 30px var(--btn-danger-hover-glow)'
             }}>
               <Power size={36} />
             </div>
 
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-heading)', marginBottom: '8px' }}>
               End Session
             </h3>
 
-            <p style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fda4af', marginBottom: '8px' }}>
+            <p style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--accent-rose)', marginBottom: '8px' }}>
               Are you sure?
             </p>
 
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '28px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '30px', lineHeight: 1.55 }}>
               Ending this session will disconnect all connected display phones and return them to the home screen.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
               <button
                 onClick={() => setIsEndSessionOpen(false)}
                 className="btn-secondary"
                 disabled={isEnding}
-                style={{ padding: '12px', fontSize: '0.95rem' }}
+                style={{ padding: '14px', fontSize: '0.95rem' }}
               >
                 Cancel
               </button>
@@ -342,10 +341,9 @@ export default function MasterDashboard({ sessionId, onNavigate }) {
                 className="btn-danger"
                 disabled={isEnding}
                 style={{
-                  padding: '12px',
+                  padding: '14px',
                   fontSize: '0.95rem',
-                  fontWeight: 700,
-                  boxShadow: '0 4px 15px rgba(244, 63, 94, 0.4)'
+                  fontWeight: 700
                 }}
               >
                 {isEnding ? 'Ending...' : 'End Session'}

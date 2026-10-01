@@ -56,17 +56,18 @@ export default function CreateSession({ onNavigate, onCreated }) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(99, 102, 241, 0.15)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
+            background: 'var(--nm-surface-dark)',
+            boxShadow: 'var(--nm-inset-sm)',
+            border: '1px solid var(--btn-primary-border)',
             padding: '6px 16px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.85rem',
-            color: '#a5b4fc',
+            color: 'var(--accent-primary)',
             marginBottom: '12px'
           }}>
             <Sparkles size={16} /> Step 1: Session Setup
           </div>
-          <h2 style={{ fontSize: '2.2rem', color: '#fff', marginBottom: '8px' }}>
+          <h2 style={{ fontSize: '2.2rem', color: 'var(--text-heading)', marginBottom: '8px' }}>
             Create MultiScreen Session
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
@@ -76,9 +77,10 @@ export default function CreateSession({ onNavigate, onCreated }) {
 
         {error && (
           <div style={{
-            background: 'rgba(244, 63, 94, 0.15)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            color: '#fda4af',
+            background: 'var(--nm-surface-dark)',
+            boxShadow: 'var(--nm-inset-sm)',
+            border: '1px solid var(--btn-danger-border)',
+            color: 'var(--accent-rose)',
             padding: '12px',
             borderRadius: '10px',
             marginBottom: '20px',
@@ -102,8 +104,8 @@ export default function CreateSession({ onNavigate, onCreated }) {
                 key={layout.id}
                 onClick={() => setSelectedLayout(layout.id)}
                 style={{
-                  background: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                  border: isSelected ? '2px solid #6366f1' : '1px solid rgba(255, 255, 255, 0.08)',
+                  background: isSelected ? 'var(--nm-surface-light)' : 'var(--nm-surface)',
+                  border: isSelected ? '2px solid var(--accent-primary)' : 'var(--border-card)',
                   borderRadius: '16px',
                   padding: '20px 16px',
                   cursor: 'pointer',
@@ -111,7 +113,9 @@ export default function CreateSession({ onNavigate, onCreated }) {
                   flexDirection: 'column',
                   alignItems: 'center',
                   transition: 'all 0.2s',
-                  boxShadow: isSelected ? '0 0 25px rgba(99, 102, 241, 0.35)' : 'none',
+                  boxShadow: isSelected
+                    ? '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 25px var(--btn-primary-glow)'
+                    : 'var(--nm-raised-sm)',
                   transform: isSelected ? 'scale(1.03)' : 'none'
                 }}
               >
@@ -123,7 +127,8 @@ export default function CreateSession({ onNavigate, onCreated }) {
                   gap: '4px',
                   width: '80px',
                   height: '56px',
-                  background: 'rgba(0,0,0,0.5)',
+                  background: 'var(--nm-surface-dark)',
+                  boxShadow: 'var(--nm-inset-sm)',
                   padding: '6px',
                   borderRadius: '8px',
                   marginBottom: '14px'
@@ -132,17 +137,18 @@ export default function CreateSession({ onNavigate, onCreated }) {
                     <div
                       key={i}
                       style={{
-                        background: isSelected ? '#6366f1' : 'rgba(255,255,255,0.2)',
-                        borderRadius: '3px'
+                        background: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)',
+                        borderRadius: '3px',
+                        opacity: isSelected ? 1 : 0.35
                       }}
                     />
                   ))}
                 </div>
 
-                <div style={{ fontWeight: 800, fontSize: '1.2rem', color: isSelected ? '#fff' : '#cbd5e1' }}>
+                <div style={{ fontWeight: 800, fontSize: '1.2rem', color: isSelected ? 'var(--text-heading)' : 'var(--text-muted)' }}>
                   {layout.name}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: isSelected ? '#a5b4fc' : 'var(--text-dim)', textAlign: 'center', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.8rem', color: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)', textAlign: 'center', marginTop: '4px' }}>
                   {layout.desc}
                 </div>
               </div>

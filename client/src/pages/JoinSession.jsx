@@ -36,6 +36,9 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
     const match = str.match(/MS-[A-Z0-9]{6}/i);
     if (match) return match[0].toUpperCase();
     const clean = str.trim().toUpperCase();
+    if (/^[A-Z0-9]{6}$/.test(clean)) {
+      return `MS-${clean}`;
+    }
     return clean;
   };
 
@@ -178,6 +181,29 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
     }
   };
 
+  // Tab button styling helper
+  const tabStyle = (tabKey, accentColor) => {
+    const isActive = activeTab === tabKey;
+    return {
+      background: isActive ? 'var(--nm-surface-dark)' : 'var(--nm-surface)',
+      border: isActive
+        ? `1px solid ${accentColor}`
+        : 'var(--border-card)',
+      borderRadius: '10px',
+      padding: '10px 6px',
+      color: isActive ? accentColor : 'var(--text-muted)',
+      fontSize: '0.78rem',
+      fontWeight: 600,
+      cursor: 'pointer',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '4px',
+      transition: 'all 0.2s',
+      boxShadow: isActive ? 'var(--nm-pressed)' : 'var(--nm-raised-sm)'
+    };
+  };
+
   return (
     <div style={{ maxWidth: '540px', margin: '30px auto', padding: '0 20px' }}>
       <button
@@ -198,17 +224,18 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(6, 182, 212, 0.15)',
+            background: 'var(--nm-surface-dark)',
+            boxShadow: 'var(--nm-inset-sm)',
             border: '1px solid rgba(6, 182, 212, 0.3)',
             padding: '6px 16px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.85rem',
-            color: '#22d3ee',
+            color: 'var(--accent-cyan)',
             marginBottom: '10px'
           }}>
             <Smartphone size={16} /> Connect Display Phone
           </div>
-          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-heading)', marginBottom: '6px' }}>
             Join Multi-Phone Wall
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
@@ -219,9 +246,10 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
         {/* Error message */}
         {error && (
           <div style={{
-            background: 'rgba(244, 63, 94, 0.15)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            color: '#fda4af',
+            background: 'var(--nm-surface-dark)',
+            boxShadow: 'var(--nm-inset-sm)',
+            border: '1px solid var(--btn-danger-border)',
+            color: 'var(--accent-rose)',
             padding: '12px',
             borderRadius: '10px',
             marginBottom: '20px',
@@ -239,7 +267,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
 
         {/* Device Nickname (Shared across all tabs) */}
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: 600 }}>
+          <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
             Device Nickname
           </label>
           <input
@@ -249,11 +277,8 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
             onChange={(e) => setDeviceName(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
               borderRadius: '10px',
               padding: '10px 14px',
-              color: '#fff',
               fontSize: '0.95rem',
               outline: 'none'
             }}
@@ -267,12 +292,12 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
               width: '100%',
               maxWidth: '320px',
               height: '240px',
-              background: '#090a12',
+              background: 'var(--nm-surface-dark)',
+              boxShadow: 'var(--nm-inset)',
               borderRadius: '18px',
               position: 'relative',
               overflow: 'hidden',
-              border: '2px solid rgba(0, 229, 255, 0.4)',
-              boxShadow: '0 0 25px rgba(0, 229, 255, 0.2)',
+              border: '2px solid var(--accent-cyan)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -288,7 +313,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 />
               ) : (
                 <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
-                  <Camera size={44} color="#64748b" style={{ margin: '0 auto 10px' }} />
+                  <Camera size={44} color="var(--text-dim)" style={{ margin: '0 auto 10px' }} />
                   <p style={{ fontSize: '0.82rem', marginBottom: '12px' }}>
                     {hasCamera ? 'Starting camera...' : 'Camera unavailable or permission denied'}
                   </p>
@@ -304,7 +329,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 position: 'absolute',
                 width: '180px',
                 height: '180px',
-                border: '2px solid #00e5ff',
+                border: '2px solid var(--accent-cyan)',
                 borderRadius: '16px',
                 boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.55)',
                 pointerEvents: 'none',
@@ -317,18 +342,18 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                   position: 'absolute',
                   width: '100%',
                   height: '2px',
-                  background: '#00e5ff',
-                  boxShadow: '0 0 8px #00e5ff',
+                  background: 'var(--accent-cyan)',
+                  boxShadow: '0 0 8px var(--accent-cyan)',
                   animation: 'scanLine 2s linear infinite'
                 }} />
               </div>
             </div>
 
-            <p style={{ fontSize: '0.85rem', color: '#38bdf8', marginBottom: '18px', textAlign: 'center' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', marginBottom: '18px', textAlign: 'center' }}>
               {scanMessage}
             </p>
 
-            <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', textAlign: 'center' }}>
+            <div style={{ width: '100%', borderTop: 'var(--border-card)', paddingTop: '16px', textAlign: 'center' }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
                 Don't have camera access? Switch to <strong>Enter Session ID</strong> or <strong>Join with Link</strong> below.
               </span>
@@ -346,7 +371,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
             style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
           >
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: 600 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
                 Paste Session Link
               </label>
               <input
@@ -357,11 +382,8 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 required
                 style={{
                   width: '100%',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
                   borderRadius: '12px',
                   padding: '12px 14px',
-                  color: '#fff',
                   fontSize: '0.95rem',
                   outline: 'none'
                 }}
@@ -389,7 +411,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
             style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
           >
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: 600 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-label)', marginBottom: '6px', fontWeight: 600 }}>
                 Session ID / Code
               </label>
               <input
@@ -400,11 +422,8 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
                 required
                 style={{
                   width: '100%',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
                   borderRadius: '12px',
                   padding: '14px 16px',
-                  color: '#fff',
                   fontSize: '1.25rem',
                   fontFamily: 'monospace',
                   fontWeight: 700,
@@ -433,26 +452,12 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
           gap: '8px',
           marginTop: '28px',
           paddingTop: '20px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+          borderTop: 'var(--border-card)'
         }}>
           <button
             type="button"
             onClick={() => setActiveTab('scan')}
-            style={{
-              background: activeTab === 'scan' ? 'rgba(0, 229, 255, 0.18)' : 'rgba(255, 255, 255, 0.03)',
-              border: activeTab === 'scan' ? '1px solid #00e5ff' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '10px',
-              padding: '10px 6px',
-              color: activeTab === 'scan' ? '#00e5ff' : 'var(--text-muted)',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.2s'
-            }}
+            style={tabStyle('scan', 'var(--accent-cyan)')}
           >
             <QrCode size={16} />
             <span>Scan QR Code</span>
@@ -461,21 +466,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
           <button
             type="button"
             onClick={() => setActiveTab('link')}
-            style={{
-              background: activeTab === 'link' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.03)',
-              border: activeTab === 'link' ? '1px solid #818cf8' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '10px',
-              padding: '10px 6px',
-              color: activeTab === 'link' ? '#a5b4fc' : 'var(--text-muted)',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.2s'
-            }}
+            style={tabStyle('link', 'var(--accent-primary)')}
           >
             <LinkIcon size={16} />
             <span>Join with Link</span>
@@ -484,21 +475,7 @@ export default function JoinSession({ onNavigate, initialCode = '', onJoined }) 
           <button
             type="button"
             onClick={() => setActiveTab('code')}
-            style={{
-              background: activeTab === 'code' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.03)',
-              border: activeTab === 'code' ? '1px solid #c084fc' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '10px',
-              padding: '10px 6px',
-              color: activeTab === 'code' ? '#d8b4fe' : 'var(--text-muted)',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.2s'
-            }}
+            style={tabStyle('code', 'var(--accent-secondary)')}
           >
             <KeyRound size={16} />
             <span>Enter Session ID</span>

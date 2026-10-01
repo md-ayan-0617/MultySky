@@ -45,17 +45,17 @@ export default function DeviceList({
     <div className="glass-panel" style={{ padding: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            background: 'rgba(6, 182, 212, 0.2)',
-            padding: '8px',
+          <div className="nm-icon-box" style={{
+            width: '36px',
+            height: '36px',
             borderRadius: '10px',
-            color: '#22d3ee',
+            color: 'var(--accent-cyan)',
             display: 'flex'
           }}>
             <Smartphone size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Connected Display Devices</h3>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)' }}>Connected Display Devices</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {connectedCount} of {totalSlots} screen slots paired
             </p>
@@ -72,12 +72,14 @@ export default function DeviceList({
         <div style={{
           textAlign: 'center',
           padding: '36px 20px',
-          border: '1px dashed rgba(255,255,255,0.15)',
+          border: 'var(--border-card)',
+          borderStyle: 'dashed',
           borderRadius: '14px',
-          background: 'rgba(255,255,255,0.02)'
+          background: 'var(--nm-surface-dark)',
+          boxShadow: 'var(--nm-inset-sm)'
         }}>
-          <Smartphone size={40} color="#64748b" style={{ marginBottom: '12px', opacity: 0.7 }} />
-          <h4 style={{ color: '#cbd5e1', marginBottom: '6px' }}>No Display Phones Connected Yet</h4>
+          <Smartphone size={40} color="var(--text-dim)" style={{ marginBottom: '12px', opacity: 0.7 }} />
+          <h4 style={{ color: 'var(--text-label)', marginBottom: '6px' }}>No Display Phones Connected Yet</h4>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '340px', margin: '0 auto 16px' }}>
             Open the QR code modal and scan with your smartphones to connect them as display screens.
           </p>
@@ -93,15 +95,16 @@ export default function DeviceList({
               <div
                 key={device.id}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: 'var(--nm-surface)',
+                  border: 'var(--border-card)',
                   borderRadius: '12px',
                   padding: '14px 16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '12px',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxShadow: 'var(--nm-raised-sm)'
                 }}
               >
                 {/* Left side: slot index & name */}
@@ -110,23 +113,23 @@ export default function DeviceList({
                     width: '36px',
                     height: '36px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #4f46e5, #06b6d4)',
+                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-cyan))',
                     color: '#fff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 800,
                     fontSize: '1rem',
-                    boxShadow: '0 2px 8px rgba(79, 70, 229, 0.4)'
+                    boxShadow: '0 2px 8px var(--btn-primary-glow)'
                   }}>
                     {posIndex + 1}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#f1f5f9', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {device.name || `Phone ${idx + 1}`}
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>({device.deviceCode})</span>
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: '#38bdf8', fontWeight: 500, marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', fontWeight: 500, marginTop: '2px' }}>
                       Position: {device.position?.label || `Slot ${posIndex + 1}`}
                     </div>
                   </div>
@@ -141,9 +144,6 @@ export default function DeviceList({
                     value={posIndex}
                     onChange={(e) => onUpdatePosition(device.id, parseInt(e.target.value))}
                     style={{
-                      background: 'rgba(15, 23, 42, 0.8)',
-                      color: '#cbd5e1',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '8px',
                       padding: '6px 10px',
                       fontSize: '0.8rem',

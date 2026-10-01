@@ -84,6 +84,9 @@ export const createSession = ({ masterDeviceId = null, layoutId = '2x2', initial
 export const getSession = (sessionId) => {
   if (!sessionId) return null;
   const cleanId = sessionId.trim().toUpperCase();
+  if (/^[A-Z0-9]{6}$/.test(cleanId)) {
+    return sessions.get(`MS-${cleanId}`) || sessions.get(cleanId) || null;
+  }
   return sessions.get(cleanId) || null;
 };
 

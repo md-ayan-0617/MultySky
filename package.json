@@ -2,6 +2,7 @@
   "name": "multiscreen-project",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "MultiScreen - Web-Based Multi-Device Media Display Platform",
   "scripts": {
     "start": "node server/src/server.js",

@@ -20,7 +20,12 @@ export default function VirtualCake({
   // Sound effect via Web Audio API
   const playCelebrateSound = () => {
     try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
       const notes = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; // C5, D5, E5, G5, A5, C6
       notes.forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
@@ -43,13 +48,41 @@ export default function VirtualCake({
   useEffect(() => {
     if (cakeCut) {
       playCelebrateSound();
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch (e) {}
     }
   }, [cakeCut]);
+
+  useEffect(() => {
+    if (candlesBlown) {
+      try {
+        confetti({
+          particleCount: 70,
+          spread: 60,
+          origin: { y: 0.5 },
+          colors: ['#38bdf8', '#fbbf24', '#ffffff']
+        });
+      } catch (e) {}
+    }
+  }, [candlesBlown]);
+
+  useEffect(() => {
+    if (interactiveState?.confettiTriggered) {
+      playCelebrateSound();
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 90,
+          origin: { y: 0.5 }
+        });
+      } catch (e) {}
+    }
+  }, [interactiveState?.confettiTriggered]);
 
   // Touch / Drag cutting gesture
   const handlePointerDown = (e) => {

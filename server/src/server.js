@@ -43,21 +43,29 @@ app.use('/api/media', mediaRoutes);
 // Helper endpoint to get server local IP addresses (useful for QR code on mobile devices)
 app.get('/api/server-info', (req, res) => {
   const interfaces = os.networkInterfaces();
-  const addresses = [];
+  const physicalIps = [];
+  const virtualIps = [];
 
-  for (const k in interfaces) {
-    for (const k2 in interfaces[k]) {
-      const address = interfaces[k][k2];
-      if (address.family === 'IPv4' && !address.internal) {
-        addresses.push(address.address);
+  for (const name in interfaces) {
+    const isVirtual = /(virtual|vethernet|vmware|box|docker|pseudo|loopback)/i.test(name);
+    for (const item of interfaces[name] || []) {
+      const isIpv4 = item.family === 'IPv4' || item.family === 4;
+      if (isIpv4 && !item.internal) {
+        if (isVirtual) {
+          virtualIps.push(item.address);
+        } else {
+          physicalIps.push(item.address);
+        }
       }
     }
   }
 
+  const allAddresses = [...physicalIps, ...virtualIps];
+
   res.json({
     success: true,
-    lanIps: addresses,
-    preferredIp: addresses[0] || 'localhost',
+    lanIps: allAddresses,
+    preferredIp: physicalIps[0] || virtualIps[0] || 'localhost',
     port: process.env.PORT || 3001,
     clientPort: 5173
   });

@@ -38,13 +38,13 @@ export default function PlaybackControls({
           <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Current Media:
           </span>
-          <span style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.95rem' }}>
+          <span style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.95rem' }}>
             {media?.name || 'No Media Selected'}
           </span>
         </div>
 
         {isInteractive && (
-          <span className="badge" style={{ background: 'rgba(236, 72, 153, 0.2)', color: '#f472b6', border: '1px solid rgba(236,72,153,0.3)' }}>
+          <span className="badge" style={{ background: 'var(--nm-surface-dark)', boxShadow: 'var(--nm-inset-sm)', color: 'var(--accent-pink)', border: '1px solid var(--btn-danger-border)' }}>
             ✨ Live Interactive Session
           </span>
         )}
@@ -66,7 +66,6 @@ export default function PlaybackControls({
               onChange={(e) => onSeek(parseFloat(e.target.value))}
               style={{
                 flex: 1,
-                accentColor: '#6366f1',
                 cursor: 'pointer',
                 height: '6px',
                 borderRadius: '4px'
@@ -126,8 +125,8 @@ export default function PlaybackControls({
                         borderRadius: '50%',
                         background: color,
                         border: interactiveState?.waveColor === color
-                          ? '3px solid #fff'
-                          : '2px solid rgba(255,255,255,0.2)',
+                          ? '3px solid var(--text-heading)'
+                          : '2px solid var(--text-dim)',
                         cursor: 'pointer',
                         boxShadow: interactiveState?.waveColor === color
                           ? `0 0 10px ${color}` : 'none',
@@ -150,13 +149,16 @@ export default function PlaybackControls({
                         padding: '4px 10px',
                         fontSize: '0.75rem',
                         background: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
-                          ? 'rgba(0, 255, 255, 0.2)'
+                          ? 'var(--nm-surface-dark)'
                           : undefined,
                         borderColor: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
-                          ? 'rgba(0,255,255,0.5)'
+                          ? 'var(--accent-cyan)'
                           : undefined,
                         color: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
-                          ? '#00ffff'
+                          ? 'var(--accent-cyan)'
+                          : undefined,
+                        boxShadow: Math.abs((interactiveState?.waveSpeed ?? 1) - v) < 0.05
+                          ? 'var(--nm-pressed)'
                           : undefined
                       }}
                     >
@@ -171,7 +173,7 @@ export default function PlaybackControls({
                   className="btn-primary"
                   style={{
                     background: 'linear-gradient(135deg, #00bfff, #6610f2)',
-                    boxShadow: '0 4px 15px rgba(0,191,255,0.4)',
+                    boxShadow: '4px 4px 12px var(--nm-dark-shadow), -4px -4px 12px var(--nm-light-shadow), 0 4px 15px rgba(0,191,255,0.4)',
                     padding: '8px 16px'
                   }}
                 >
@@ -182,9 +184,10 @@ export default function PlaybackControls({
                   onClick={() => onTriggerInteractive('CYBER_GLITCH', { active: !interactiveState?.glitchActive })}
                   className="btn-secondary"
                   style={{
-                    borderColor: interactiveState?.glitchActive ? 'rgba(255,0,80,0.5)' : undefined,
-                    color: interactiveState?.glitchActive ? '#ff4060' : undefined,
-                    background: interactiveState?.glitchActive ? 'rgba(255,0,80,0.15)' : undefined
+                    borderColor: interactiveState?.glitchActive ? 'var(--accent-rose)' : undefined,
+                    color: interactiveState?.glitchActive ? 'var(--accent-rose)' : undefined,
+                    background: interactiveState?.glitchActive ? 'var(--nm-surface-dark)' : undefined,
+                    boxShadow: interactiveState?.glitchActive ? 'var(--nm-pressed)' : undefined
                   }}
                 >
                   {interactiveState?.glitchActive ? '🔴 Glitch ON' : '⚫ Glitch OFF'}
@@ -207,7 +210,7 @@ export default function PlaybackControls({
                 className="btn-primary"
                 style={{
                   background: 'linear-gradient(135deg, #ec4899, #f43f5e)',
-                  boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)'
+                  boxShadow: '4px 4px 12px var(--nm-dark-shadow), -4px -4px 12px var(--nm-light-shadow), 0 4px 15px rgba(236, 72, 153, 0.4)'
                 }}
               >
                 <Cake size={18} /> Cut Birthday Cake! 🎂
@@ -216,7 +219,7 @@ export default function PlaybackControls({
               <button
                 onClick={() => onTriggerInteractive('CANDLE_BLOW')}
                 className="btn-secondary"
-                style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
+                style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: 'var(--accent-amber)' }}
               >
                 <Flame size={16} /> Blow Candles 🕯️
               </button>
@@ -225,7 +228,7 @@ export default function PlaybackControls({
                 onClick={() => onTriggerInteractive('CONFETTI_BURST')}
                 className="btn-secondary"
               >
-                <Sparkles size={16} color="#a855f7" /> Confetti 🎉
+                <Sparkles size={16} color="var(--accent-secondary)" /> Confetti 🎉
               </button>
 
               <button
@@ -253,7 +256,7 @@ export default function PlaybackControls({
                 onClick={onToggleMute}
                 style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}
               >
-                {isMuted ? <VolumeX size={18} color="#f87171" /> : <Volume2 size={18} />}
+                {isMuted ? <VolumeX size={18} color="var(--accent-rose)" /> : <Volume2 size={18} />}
               </button>
               <input
                 type="range"
@@ -262,7 +265,7 @@ export default function PlaybackControls({
                 step="0.05"
                 value={isMuted ? 0 : volume}
                 onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-                style={{ width: '80px', accentColor: '#6366f1', cursor: 'pointer' }}
+                style={{ width: '80px', cursor: 'pointer' }}
               />
             </div>
           )}

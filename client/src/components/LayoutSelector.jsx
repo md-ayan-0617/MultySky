@@ -17,17 +17,17 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
     <div className="glass-panel" style={{ padding: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            background: 'rgba(99, 102, 241, 0.2)',
-            padding: '8px',
+          <div className="nm-icon-box" style={{
+            width: '36px',
+            height: '36px',
             borderRadius: '10px',
-            color: '#a5b4fc',
+            color: 'var(--accent-primary)',
             display: 'flex'
           }}>
             <Grid size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Screen Layout Configuration</h3>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)' }}>Screen Layout Configuration</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Select how many smartphones will combine to form your display
             </p>
@@ -52,8 +52,8 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
               key={item.id}
               onClick={() => onSelectLayout(item.id)}
               style={{
-                background: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                border: isSelected ? '2px solid #6366f1' : '1px solid rgba(255, 255, 255, 0.08)',
+                background: isSelected ? 'var(--nm-surface-light)' : 'var(--nm-surface)',
+                border: isSelected ? '2px solid var(--accent-primary)' : 'var(--border-card)',
                 borderRadius: '14px',
                 padding: '14px 10px',
                 display: 'flex',
@@ -61,7 +61,9 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                 alignItems: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: isSelected ? '0 0 20px rgba(99, 102, 241, 0.35)' : 'none',
+                boxShadow: isSelected
+                  ? '6px 6px 14px var(--nm-dark-shadow), -6px -6px 14px var(--nm-light-shadow), 0 0 20px var(--btn-primary-glow)'
+                  : 'var(--nm-raised-sm)',
                 transform: isSelected ? 'scale(1.02)' : 'scale(1)'
               }}
             >
@@ -73,7 +75,8 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                 gap: '3px',
                 width: '64px',
                 height: '48px',
-                background: 'rgba(0,0,0,0.4)',
+                background: 'var(--nm-surface-dark)',
+                boxShadow: 'var(--nm-inset-sm)',
                 padding: '4px',
                 borderRadius: '6px',
                 marginBottom: '10px'
@@ -82,14 +85,15 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                   <div
                     key={idx}
                     style={{
-                      background: isSelected ? '#6366f1' : 'rgba(255, 255, 255, 0.2)',
+                      background: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)',
                       borderRadius: '2px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '0.65rem',
                       fontWeight: 700,
-                      color: isSelected ? '#fff' : 'rgba(255, 255, 255, 0.6)'
+                      color: isSelected ? '#fff' : 'var(--text-muted)',
+                      opacity: isSelected ? 1 : 0.4
                     }}
                   >
                     {idx + 1}
@@ -97,10 +101,10 @@ export default function LayoutSelector({ currentLayout, onSelectLayout }) {
                 ))}
               </div>
 
-              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: isSelected ? '#fff' : '#cbd5e1' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: isSelected ? 'var(--text-heading)' : 'var(--text-muted)' }}>
                 {item.name}
               </div>
-              <div style={{ fontSize: '0.75rem', color: isSelected ? '#a5b4fc' : 'var(--text-dim)', marginTop: '2px' }}>
+              <div style={{ fontSize: '0.75rem', color: isSelected ? 'var(--accent-primary)' : 'var(--text-dim)', marginTop: '2px' }}>
                 {item.desc}
               </div>
             </div>

@@ -59,27 +59,20 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
         width: '100%',
         padding: '28px',
         position: 'relative',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-        border: '1px solid rgba(99, 102, 241, 0.3)',
+        boxShadow: 'var(--nm-raised-lg), 0 0 30px var(--btn-primary-glow)',
+        border: '1px solid var(--btn-primary-border)',
         animation: 'float 6s ease-in-out infinite'
       }}>
         {/* Close Button */}
         <button
           onClick={onClose}
+          className="nm-btn-circle"
           style={{
             position: 'absolute',
             top: '20px',
             right: '20px',
-            background: 'rgba(255,255,255,0.08)',
-            border: 'none',
-            color: 'var(--text-muted)',
             width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer'
+            height: '36px'
           }}
         >
           <X size={20} />
@@ -91,17 +84,18 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(99, 102, 241, 0.15)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
+            background: 'var(--nm-surface-dark)',
+            boxShadow: 'var(--nm-inset-sm)',
+            border: '1px solid var(--btn-primary-border)',
             padding: '6px 14px',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.85rem',
-            color: '#a5b4fc',
+            color: 'var(--accent-primary)',
             marginBottom: '10px'
           }}>
             <Smartphone size={16} /> Connect Display Phones
           </div>
-          <h2 style={{ fontSize: '1.6rem', color: '#fff' }}>Pair Display Device</h2>
+          <h2 style={{ fontSize: '1.6rem', color: 'var(--text-heading)' }}>Pair Display Device</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
             Scan with your phone's camera to join this multi-screen session.
           </p>
@@ -118,32 +112,33 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-          border: '4px solid rgba(99, 102, 241, 0.4)'
+          boxShadow: '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow)',
+          border: '4px solid var(--accent-primary)'
         }}>
           {qrDataUrl ? (
             <img src={qrDataUrl} alt="Join QR Code" style={{ width: '100%', height: '100%', borderRadius: '8px' }} />
           ) : (
-            <div style={{ color: '#64748b' }}>Generating QR...</div>
+            <div style={{ color: 'var(--text-dim)' }}>Generating QR...</div>
           )}
         </div>
 
         {/* Session Code Highlight */}
         <div style={{
-          background: 'rgba(255,255,255,0.04)',
+          background: 'var(--nm-surface-dark)',
+          boxShadow: 'var(--nm-inset-sm)',
           borderRadius: '12px',
           padding: '12px 16px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: '16px',
-          border: '1px solid rgba(255,255,255,0.08)'
+          border: 'var(--border-card)'
         }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Session ID Code
             </div>
-            <div style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '2px', color: '#38bdf8' }}>
+            <div style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '2px', color: 'var(--accent-cyan)' }}>
               {sessionId}
             </div>
           </div>
@@ -152,7 +147,7 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
             className="btn-secondary"
             style={{ padding: '8px 14px', fontSize: '0.85rem' }}
           >
-            {copied ? <><Check size={16} color="#34d399" /> Copied!</> : <><Copy size={16} /> Copy Link</>}
+            {copied ? <><Check size={16} color="var(--accent-emerald)" /> Copied!</> : <><Copy size={16} /> Copy Link</>}
           </button>
         </div>
 
@@ -161,8 +156,9 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
           <div style={{
             fontSize: '0.8rem',
             color: 'var(--text-muted)',
-            background: 'rgba(6, 182, 212, 0.08)',
-            border: '1px solid rgba(6, 182, 212, 0.2)',
+            background: 'var(--nm-surface-dark)',
+            boxShadow: 'var(--nm-inset-sm)',
+            border: 'var(--border-card)',
             borderRadius: '10px',
             padding: '10px 14px',
             marginBottom: '16px',
@@ -171,7 +167,7 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
             justifyContent: 'space-between'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Wifi size={16} color="#06b6d4" />
+              <Wifi size={16} color="var(--accent-cyan)" />
               <span>Wi-Fi LAN IP: <strong>{lanIp}</strong></span>
             </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.75rem' }}>

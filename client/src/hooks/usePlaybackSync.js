@@ -8,7 +8,11 @@ export function usePlaybackSync({ sessionId, isMaster = false, clockOffset = 0, 
   const [interactiveState, setInteractiveState] = useState({
     cakeCut: false,
     cutPosition: null,
-    candlesBlown: false
+    candlesBlown: false,
+    waveColor: '#00ffff',
+    waveSpeed: 1.0,
+    glitchActive: false,
+    ripples: []
   });
 
   const mediaRef = useRef(null); // Ref to video or audio element
@@ -52,6 +56,33 @@ export function usePlaybackSync({ sessionId, isMaster = false, clockOffset = 0, 
   const triggerInteractive = useCallback((eventType, data = {}) => {
     socket.emit('interactive-event', { sessionId, eventType, data });
     broadcastLocal('INTERACTIVE_EVENT', { eventType, data });
+
+    setInteractiveState(prev => {
+      const next = { ...prev };
+      if (eventType === 'CAKE_CUT') {
+        next.cakeCut = true;
+        next.cutPosition = data?.cutPosition || { x: 0.5, y: 0.5 };
+      } else if (eventType === 'CANDLE_BLOW') {
+        next.candlesBlown = true;
+      } else if (eventType === 'RESET_CAKE') {
+        next.cakeCut = false;
+        next.candlesBlown = false;
+      } else if (eventType === 'CYBER_COLOR') {
+        next.waveColor = data?.color || '#00ffff';
+      } else if (eventType === 'CYBER_SPEED') {
+        next.waveSpeed = data?.speed || 1.0;
+      } else if (eventType === 'CYBER_GLITCH') {
+        next.glitchActive = !!data?.active;
+      } else if (eventType === 'CYBER_RESET') {
+        next.waveColor = '#00ffff';
+        next.waveSpeed = 1.0;
+        next.glitchActive = false;
+        next.ripples = [];
+      } else if (eventType === 'CYBER_RIPPLE') {
+        next.ripples = [...(next.ripples || []).slice(-15), { globalX: data?.globalX || 0, globalY: data?.globalY || 0, t: data?.t || Date.now() }];
+      }
+      return next;
+    });
   }, [sessionId, socket]);
 
   useEffect(() => {

@@ -79,17 +79,17 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
     <div className="glass-panel" style={{ padding: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            background: 'rgba(236, 72, 153, 0.2)',
-            padding: '8px',
+          <div className="nm-icon-box" style={{
+            width: '36px',
+            height: '36px',
             borderRadius: '10px',
-            color: '#f472b6',
+            color: 'var(--accent-pink)',
             display: 'flex'
           }}>
             <Sparkles size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Media & Experience Library</h3>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-heading)' }}>Media & Experience Library</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Choose a viral interactive experience, photo, or synchronized video
             </p>
@@ -123,16 +123,17 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
         overflowX: 'auto',
         paddingBottom: '12px',
         marginBottom: '16px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)'
+        borderBottom: 'var(--border-card)'
       }}>
         {categories.map(cat => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
             style={{
-              background: activeCategory === cat ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-              color: activeCategory === cat ? '#fff' : 'var(--text-muted)',
-              border: activeCategory === cat ? '1px solid rgba(99, 102, 241, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
+              background: activeCategory === cat ? 'var(--nm-surface-dark)' : 'var(--nm-surface)',
+              color: activeCategory === cat ? 'var(--text-heading)' : 'var(--text-muted)',
+              border: activeCategory === cat ? '1px solid var(--accent-primary)' : 'var(--border-card)',
+              boxShadow: activeCategory === cat ? 'var(--nm-pressed)' : 'var(--nm-raised-sm)',
               padding: '6px 14px',
               borderRadius: 'var(--radius-full)',
               fontSize: '0.8rem',
@@ -165,15 +166,17 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
               key={item.id}
               onClick={() => onSelectMedia(item)}
               style={{
-                background: isSelected ? 'rgba(99, 102, 241, 0.18)' : 'rgba(255, 255, 255, 0.03)',
-                border: isSelected ? '2px solid #6366f1' : '1px solid rgba(255, 255, 255, 0.08)',
+                background: isSelected ? 'var(--nm-surface-light)' : 'var(--nm-surface)',
+                border: isSelected ? '2px solid var(--accent-primary)' : 'var(--border-card)',
                 borderRadius: '14px',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: isSelected ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
+                boxShadow: isSelected
+                  ? '6px 6px 16px var(--nm-dark-shadow), -6px -6px 16px var(--nm-light-shadow), 0 0 20px var(--btn-primary-glow)'
+                  : 'var(--nm-raised-sm)',
                 transform: isSelected ? 'scale(1.02)' : 'none'
               }}
             >
@@ -215,7 +218,7 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
                     position: 'absolute',
                     top: '8px',
                     right: '8px',
-                    background: '#6366f1',
+                    background: 'var(--accent-primary)',
                     borderRadius: '50%',
                     width: '24px',
                     height: '24px',
@@ -223,7 +226,7 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fff',
-                    boxShadow: '0 2px 8px rgba(99, 102, 241, 0.8)'
+                    boxShadow: '0 2px 8px var(--btn-primary-hover-glow)'
                   }}>
                     <Check size={14} strokeWidth={3} />
                   </div>
@@ -233,7 +236,7 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
               {/* Info Details */}
               <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.85rem', color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-heading)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {item.name}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '2px' }}>
@@ -245,7 +248,7 @@ export default function MediaLibrary({ currentMedia, onSelectMedia, sessionId })
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
                     <button
                       onClick={(e) => handleDelete(e, item.id)}
-                      style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', padding: '2px' }}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent-rose)', cursor: 'pointer', padding: '2px' }}
                     >
                       <Trash2 size={14} />
                     </button>

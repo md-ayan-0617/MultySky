@@ -32,29 +32,33 @@ export default function CanvasDisplay({
     // Bezel gap adjustment percentages
     const gapXPct = (bezel?.gapX || 0) / 100;
     const gapYPct = (bezel?.gapY || 0) / 100;
-    const scaleFactor = (bezel?.scale || 100) / 100;
+    const scaleFactor = Math.max(0.2, (bezel?.scale || 100) / 100);
     const offX = bezel?.offsetX || 0;
     const offY = bezel?.offsetY || 0;
 
     // Calculate crop coordinates based on technical architecture formula
     // Base width & height per cell
-    const baseW = sourceW / totalCols;
-    const baseH = sourceH / totalRows;
+    const cols = Math.max(1, totalCols);
+    const rows = Math.max(1, totalRows);
+    const baseW = sourceW / cols;
+    const baseH = sourceH / rows;
 
     // Apply scale / zoom factor to crop window
-    let cropW = baseW / Math.max(0.5, scaleFactor);
-    let cropH = baseH / Math.max(0.5, scaleFactor);
+    let cropW = Math.min(sourceW, baseW / scaleFactor);
+    let cropH = Math.min(sourceH, baseH / scaleFactor);
 
     // Center scaled crop inside the cell
-    let cropX = (col / totalCols) * sourceW + (baseW - cropW) / 2;
-    let cropY = (row / totalRows) * sourceH + (baseH - cropH) / 2;
+    let cropX = (col / cols) * sourceW + (baseW - cropW) / 2;
+    let cropY = (row / rows) * sourceH + (baseH - cropH) / 2;
 
     // Apply bezel compensation: shift inner crop to compensate for physical phone borders
-    const bezelShiftX = baseW * gapXPct * (col - (totalCols - 1) / 2);
-    const bezelShiftY = baseH * gapYPct * (row - (totalRows - 1) / 2);
+    const bezelShiftX = baseW * gapXPct * (col - (cols - 1) / 2);
+    const bezelShiftY = baseH * gapYPct * (row - (rows - 1) / 2);
 
-    cropX = Math.max(0, Math.min(sourceW - cropW, cropX + bezelShiftX + offX));
-    cropY = Math.max(0, Math.min(sourceH - cropH, cropY + bezelShiftY + offY));
+    const maxCropX = Math.max(0, sourceW - cropW);
+    const maxCropY = Math.max(0, sourceH - cropH);
+    cropX = Math.max(0, Math.min(maxCropX, cropX + bezelShiftX + offX));
+    cropY = Math.max(0, Math.min(maxCropY, cropY + bezelShiftY + offY));
 
     // Clear and draw the cropped region onto canvas to fit display
     ctx.drawImage(

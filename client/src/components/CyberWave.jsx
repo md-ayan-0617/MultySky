@@ -50,10 +50,12 @@ export default function CyberWave({
     const setupCanvas = () => {
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      return { W: rect.width, H: rect.height };
+      const W = Math.max(1, Math.floor(rect.width || canvas.clientWidth || 300));
+      const H = Math.max(1, Math.floor(rect.height || canvas.clientHeight || 200));
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { W, H };
     };
 
     let dims = setupCanvas();
@@ -65,9 +67,17 @@ export default function CyberWave({
 
     const drawFrame = (timestamp) => {
       if (!isRunning) return;
+      if (!dims || dims.W <= 1 || dims.H <= 1) {
+        dims = setupCanvas();
+      }
       const { W, H } = dims;
+      if (W <= 1 || H <= 1) {
+        animRef.current = requestAnimationFrame(drawFrame);
+        return;
+      }
+
       const t = timestamp / 1000;
-      const speed = waveSpeed;
+      const speed = Math.max(0.1, waveSpeed);
       const [r, g, b] = hexToRgb(waveColor);
 
       // Bezel-aware offset into global virtual canvas
@@ -75,7 +85,7 @@ export default function CyberWave({
       const gapY = (bezel?.gapY || 0) / 100;
       const offsetX = col * W * (1 + gapX);
       const offsetY = row * H * (1 + gapY);
-      const GLOBAL_W = W * totalCols * (1 + gapX);
+      const GLOBAL_W = Math.max(100, W * Math.max(1, totalCols) * (1 + gapX));
 
       // ── Background ──────────────────────────────────────────────────────────
       ctx.fillStyle = '#000510';
@@ -83,7 +93,7 @@ export default function CyberWave({
 
       // Scanline grid (subtle cyber grid)
       ctx.lineWidth = 0.5;
-      const gridSize = Math.max(30, Math.floor(W / 12));
+      const gridSize = Math.max(25, Math.floor(W / 12));
       ctx.strokeStyle = `rgba(${r},${g},${b},0.05)`;
       for (let gx = -(offsetX % gridSize); gx <= W + gridSize; gx += gridSize) {
         ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
@@ -177,16 +187,16 @@ export default function CyberWave({
       });
 
       // ── Glitch Effect ────────────────────────────────────────────────────────
-      if (glitchActive) {
-        const numSlices = Math.floor(Math.random() * 6) + 3;
+      if (glitchActive && W > 10 && H > 10) {
+        const numSlices = Math.floor(Math.random() * 4) + 2;
         for (let si = 0; si < numSlices; si++) {
-          const sliceY = Math.random() * H;
-          const sliceH = Math.random() * 12 + 2;
-          const shiftX = (Math.random() - 0.5) * 25;
+          const sliceH = Math.max(2, Math.floor(Math.random() * 10 + 2));
+          const sliceY = Math.floor(Math.random() * Math.max(1, H - sliceH));
+          const shiftX = Math.round((Math.random() - 0.5) * 20);
           try {
-            const imageData = ctx.getImageData(0, sliceY, W, sliceH);
+            const imageData = ctx.getImageData(0, sliceY, Math.floor(W), sliceH);
             ctx.putImageData(imageData, shiftX, sliceY);
-          } catch(e) { /* ignore cross-origin errors */ }
+          } catch(e) { /* ignore cross-origin/bounds errors */ }
         }
         // Color fringe
         ctx.save();
