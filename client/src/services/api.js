@@ -1,5 +1,59 @@
 // api.js - REST client for MultiScreen
-const API_BASE = '/api';
+
+// Default production backend URL
+const PROD_BACKEND_URL = 'https://multysky.onrender.com';
+
+/**
+ * Resolves the base URL for REST API requests.
+ * - In development (Vite dev server), uses '/api' so requests go through the Vite proxy.
+ * - In production (Vercel / deployed build), directs requests to https://multysky.onrender.com/api
+ * - Can be overridden via VITE_API_URL or VITE_BACKEND_URL environment variables.
+ */
+export function getApiBase() {
+  const envApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+  const envBackendUrl = (import.meta.env.VITE_BACKEND_URL || '').trim();
+
+  // 1. Explicit env var override
+  if (envApiUrl) {
+    const clean = envApiUrl.replace(/\/+$/, '');
+    return clean.endsWith('/api') ? clean : `${clean}/api`;
+  }
+  if (envBackendUrl) {
+    const clean = envBackendUrl.replace(/\/+$/, '');
+    return `${clean}/api`;
+  }
+
+  // 2. Localhost development: use relative '/api' for Vite dev proxy
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+
+  // 3. Production / Vercel: send requests directly to Render backend
+  return `${PROD_BACKEND_URL}/api`;
+}
+
+export const API_BASE = getApiBase();
+
+/**
+ * Helper to safely parse responses from the server,
+ * handling both JSON and fallback text/error formats.
+ */
+async function handleResponse(res) {
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return res.json();
+  }
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      success: res.ok,
+      message: text || res.statusText || 'Server responded with non-JSON format',
+      status: res.status
+    };
+  }
+}
 
 export async function createSession(data = {}) {
   const res = await fetch(`${API_BASE}/session/create`, {
@@ -7,7 +61,7 @@ export async function createSession(data = {}) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function joinSession(data) {
@@ -16,12 +70,12 @@ export async function joinSession(data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function getSession(id) {
   const res = await fetch(`${API_BASE}/session/${id}`);
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function updateLayout(sessionId, layoutId) {
@@ -30,14 +84,14 @@ export async function updateLayout(sessionId, layoutId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ layoutId })
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function endSession(sessionId) {
   const res = await fetch(`${API_BASE}/session/${sessionId}/end`, {
     method: 'POST'
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function registerDevice(sessionId, deviceData) {
@@ -46,7 +100,7 @@ export async function registerDevice(sessionId, deviceData) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(deviceData)
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function updateDevicePosition(sessionId, deviceId, newIndex) {
@@ -55,19 +109,19 @@ export async function updateDevicePosition(sessionId, deviceId, newIndex) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ deviceId, newIndex })
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function removeDevice(sessionId, deviceId) {
   const res = await fetch(`${API_BASE}/session/${sessionId}/device/${deviceId}`, {
     method: 'DELETE'
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function getMediaList() {
   const res = await fetch(`${API_BASE}/media`);
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function uploadMedia(file, name, sessionId) {
@@ -80,20 +134,20 @@ export async function uploadMedia(file, name, sessionId) {
     method: 'POST',
     body: formData
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function deleteMedia(id) {
   const res = await fetch(`${API_BASE}/media/${id}`, {
     method: 'DELETE'
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function getServerInfo() {
   try {
     const res = await fetch(`${API_BASE}/server-info`);
-    return await res.json();
+    return await handleResponse(res);
   } catch (e) {
     return {
       success: false,

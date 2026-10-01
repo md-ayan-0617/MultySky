@@ -9,11 +9,18 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
 
   // Determine join URL
   const currentHost = window.location.host;
+  const isLocalDev = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.endsWith('.local')
+  );
+
   const lanIp = serverInfo?.lanIps?.[0] || serverInfo?.preferredIp;
   const clientPort = window.location.port || '5173';
   
-  // If we have LAN IP, provide it so mobile phones on Wi-Fi can open it easily!
-  const hostToUse = (useLanIp && lanIp && lanIp !== 'localhost' && lanIp !== '127.0.0.1')
+  // If in local dev and we have a local LAN IP, provide it so mobile phones on Wi-Fi can open it easily!
+  // In production (Vercel), always use the public domain (currentHost).
+  const hostToUse = (isLocalDev && useLanIp && lanIp && lanIp !== 'localhost' && lanIp !== '127.0.0.1')
     ? `${lanIp}:${clientPort}`
     : currentHost;
 
@@ -151,8 +158,8 @@ export default function QRCodeModal({ sessionId, isOpen, onClose, connectedCount
           </button>
         </div>
 
-        {/* Network IP Switcher */}
-        {serverInfo?.lanIps?.length > 0 && (
+        {/* Network IP Switcher (only for local development) */}
+        {isLocalDev && serverInfo?.lanIps?.length > 0 && (
           <div style={{
             fontSize: '0.8rem',
             color: 'var(--text-muted)',

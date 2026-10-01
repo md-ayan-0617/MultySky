@@ -12,32 +12,50 @@ if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
   }
 }
 
+// Default production backend URL
+const PROD_BACKEND_URL = 'https://multysky.onrender.com';
+
+/**
+ * Resolves the Socket.IO connection URL:
+ * - If VITE_BACKEND_URL or VITE_API_URL is configured, uses that.
+ * - In production (e.g. Vercel deployment), connects directly to https://multysky.onrender.com
+ * - In development (localhost), connects via window.location.origin (proxied by Vite)
+ */
+export function getSocketUrl() {
+  const envBackendUrl = (import.meta.env.VITE_BACKEND_URL || '').trim();
+  const envApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+
+  // 1. Explicit env var override
+  if (envBackendUrl) {
+    return envBackendUrl.replace(/\/+$/, '');
+  }
+  if (envApiUrl) {
+    const clean = envApiUrl.replace(/\/+$/, '');
+    return clean.endsWith('/api') ? clean.slice(0, -4) : clean;
+  }
+
+  // 2. Production (e.g. Vercel deployment) -> Render backend
+  if (!import.meta.env.DEV) {
+    return PROD_BACKEND_URL;
+  }
+
+  // 3. Localhost development: use Vite dev proxy
+  if (typeof window !== 'undefined') {
+    const { port, origin } = window.location;
+    if (port === '3001') {
+      return origin;
+    }
+    // In dev mode on port 5173 or LAN IP, Vite dev proxy forwards /socket.io
+    return origin;
+  }
+
+  return 'http://localhost:3001';
+}
+
 export function getSocket() {
   if (!socketInstance) {
-    // Determine backend URL dynamically based on environment
-    let socketUrl = import.meta.env.VITE_BACKEND_URL;
-    if (!socketUrl) {
-      if (typeof window !== 'undefined') {
-        const { hostname, port, protocol, origin } = window.location;
-        const isPrivateIp = 
-          hostname === 'localhost' || 
-          hostname === '127.0.0.1' || 
-          hostname.endsWith('.local') ||
-          /^192\.168\./.test(hostname) || 
-          /^10\./.test(hostname) ||
-          /^172\.(1[6-9]|2[0-9]|3[01])\./.test(hostname);
-
-        if (port === '3001') {
-          socketUrl = origin;
-        } else if (port === '5173' || isPrivateIp) {
-          socketUrl = `https://multysky.onrender.com`;
-        } else {
-          socketUrl = origin;
-        }
-      } else {
-        socketUrl = 'https://multysky.onrender.com';
-      }
-    }
+    const socketUrl = getSocketUrl();
+    console.log('🔗 Connecting Socket.IO to:', socketUrl);
 
     socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling'],
